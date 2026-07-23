@@ -6,12 +6,17 @@
 import { Platform } from 'react-native';
 
 export const Colors = {
-  text: '#11181C',
-  background: '#fff',
-  tint: '#0a7ea4',
-  icon: '#687076',
-  tabIconDefault: '#687076',
-  tabIconSelected: '#0a7ea4',
+  primarySoft: '#A9BFA7',
+  primary: '#7F9C7A',
+  surface: '#EDEFE7',
+  background: '#F6F4EE',
+  accent: '#DCC9A6',
+  danger: '#E76F6F',
+  text: '#2E2E2E',
+  icon: '#2E2E2E',
+  border: '#A9BFA7',
+  tabIconDefault: '#A9BFA7',
+  tabIconSelected: '#7F9C7A',
 };
 
 export const Fonts = Platform.select({
