@@ -19,12 +19,20 @@ function TaskCardComponent({
 	onToggleStar,
 }: TaskCardProps) {
 	return (
-		<View style={styles.card}>
+		<Pressable
+			accessibilityRole="button"
+			accessibilityLabel={`Open ${task.title}`}
+			onPress={onPress}
+			style={({ pressed }) => [styles.card, pressed && styles.pressedCard]}
+		>
 			<Pressable
 				accessibilityLabel={`Mark ${task.title} as ${task.completed ? "open" : "done"}`}
 				accessibilityRole="checkbox"
 				accessibilityState={{ checked: Boolean(task.completed) }}
-				onPress={onToggle}
+				onPress={(event) => {
+					event.stopPropagation();
+					onToggle();
+				}}
 				style={[styles.checkbox, task.completed && styles.checkedBox]}
 			>
 				{task.completed && (
@@ -32,12 +40,7 @@ function TaskCardComponent({
 				)}
 			</Pressable>
 
-			<Pressable
-				accessibilityRole="button"
-				accessibilityLabel={`Open ${task.title}`}
-				onPress={onPress}
-				style={styles.details}
-			>
+			<View style={styles.details}>
 				<Text
 					numberOfLines={1}
 					style={[styles.title, task.completed && styles.completedTitle]}
@@ -47,7 +50,7 @@ function TaskCardComponent({
 				<View style={styles.metaRow}>
 					<Text style={styles.category}>{task.category}</Text>
 				</View>
-			</Pressable>
+			</View>
 
 			<View style={styles.endContent}>
 				<Text style={[styles.due, task.urgent && styles.urgentDue]}>
@@ -58,7 +61,10 @@ function TaskCardComponent({
 						task.starred ? "Remove from starred" : "Add to starred"
 					}
 					hitSlop={10}
-					onPress={onToggleStar}
+					onPress={(event) => {
+						event.stopPropagation();
+						onToggleStar();
+					}}
 				>
 					<Ionicons
 						name={task.starred ? "star" : "star-outline"}
@@ -73,7 +79,7 @@ function TaskCardComponent({
 					/>
 				</Pressable>
 			</View>
-		</View>
+		</Pressable>
 	);
 }
 
@@ -92,6 +98,7 @@ const styles = StyleSheet.create({
 		borderWidth: StyleSheet.hairlineWidth,
 		borderColor: "rgba(46, 46, 46, 0.1)",
 	},
+	pressedCard: { opacity: 0.82 },
 	checkbox: {
 		width: 22,
 		height: 22,
