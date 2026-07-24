@@ -89,11 +89,8 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.surface,
 		flexDirection: "row",
 		alignItems: "center",
-		shadowColor: Colors.text,
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 5,
-		elevation: 2,
+		borderWidth: StyleSheet.hairlineWidth,
+		borderColor: "rgba(46, 46, 46, 0.1)",
 	},
 	checkbox: {
 		width: 22,

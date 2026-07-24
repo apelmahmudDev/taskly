@@ -20,9 +20,6 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		height: 48,
 		borderRadius: 14,
-		paddingHorizontal: 15,
-		color: Colors.text,
-		backgroundColor: Colors.surface,
 	},
 	addButton: {
 		width: 48,

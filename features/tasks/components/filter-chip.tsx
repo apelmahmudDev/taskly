@@ -1,6 +1,4 @@
-import { Pressable, Text } from "react-native";
-
-import { styles } from "./filter-chip.styles";
+import { Button } from "@/components/ui/button";
 
 type FilterChipProps = {
 	label: string;
@@ -10,13 +8,12 @@ type FilterChipProps = {
 
 export function FilterChip({ label, selected = false, onPress }: FilterChipProps) {
 	return (
-		<Pressable
-			accessibilityRole="button"
-			accessibilityState={{ selected }}
+		<Button
 			onPress={onPress}
-			style={({ pressed }) => [styles.chip, selected && styles.selectedChip, pressed && styles.pressed]}
+			selected={selected}
+			variant="chip"
 		>
-			<Text style={[styles.label, selected && styles.selectedLabel]}>{label}</Text>
-		</Pressable>
+			{label}
+		</Button>
 	);
 }

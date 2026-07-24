@@ -25,16 +25,7 @@ export const styles = StyleSheet.create({
 		fontSize: 13,
 		fontWeight: "700",
 	},
-	input: {
-		minHeight: 50,
-		borderRadius: 13,
-		paddingHorizontal: 15,
-		color: Colors.text,
-		backgroundColor: Colors.surface,
-		borderWidth: StyleSheet.hairlineWidth,
-		borderColor: Colors.border,
-	},
-	descriptionInput: { height: 120, paddingTop: 14, textAlignVertical: "top" },
+	descriptionInput: { height: 120 },
 	saveButton: {
 		height: 50,
 		marginTop: 8,

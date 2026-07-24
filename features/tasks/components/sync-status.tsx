@@ -15,7 +15,12 @@ export function SyncStatus({ isOnline }: SyncStatusProps) {
 
 const styles = StyleSheet.create({
 	container: { flexDirection: "row", alignItems: "center", gap: 6 },
-	dot: { width: 9, height: 9, borderRadius: 5, backgroundColor: Colors.primary },
+	dot: {
+		width: 9,
+		height: 9,
+		borderRadius: 5,
+		backgroundColor: Colors.primary,
+	},
 	offlineDot: { backgroundColor: Colors.danger },
 	label: { color: Colors.text, fontSize: 12, fontWeight: "600" },
 });

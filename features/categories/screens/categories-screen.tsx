@@ -1,8 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
-import { FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Input } from "@/components/ui/input";
 import { Colors } from "@/constants/theme";
 import { styles } from "./categories-screen.styles";
 
@@ -23,12 +24,11 @@ export function CategoriesScreen() {
 		<SafeAreaView style={styles.safeArea} edges={["top"]}>
 			<Text style={styles.title}>Categories</Text>
 			<View style={styles.addRow}>
-				<TextInput
+				<Input
 					value={name}
 					onChangeText={setName}
 					onSubmitEditing={addCategory}
 					placeholder="Category name"
-					placeholderTextColor={Colors.primarySoft}
 					style={styles.input}
 				/>
 				<Pressable

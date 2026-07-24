@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useState } from "react";
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
@@ -11,9 +12,11 @@ type TaskFilterBarProps = {
 };
 
 export function TaskFilterBar({ query, hasActiveFilters, onQueryChange, onOpenFilters }: TaskFilterBarProps) {
+	const [isSearchFocused, setIsSearchFocused] = useState(false);
+
 	return (
 		<View style={styles.row}>
-			<View style={styles.searchBox}>
+			<View style={[styles.searchBox, isSearchFocused && styles.focusedSearchBox]}>
 				<Ionicons name="search-outline" size={20} color={Colors.primary} />
 				<TextInput
 					accessibilityLabel="Search tasks"
@@ -23,6 +26,8 @@ export function TaskFilterBar({ query, hasActiveFilters, onQueryChange, onOpenFi
 					style={styles.input}
 					value={query}
 					onChangeText={onQueryChange}
+					onFocus={() => setIsSearchFocused(true)}
+					onBlur={() => setIsSearchFocused(false)}
 				/>
 			</View>
 			<Pressable
@@ -48,7 +53,10 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		gap: 10,
 		backgroundColor: Colors.surface,
+		borderWidth: StyleSheet.hairlineWidth,
+		borderColor: "rgba(46, 46, 46, 0.1)",
 	},
+	focusedSearchBox: { borderWidth: 1, borderColor: Colors.borderSoft },
 	input: { flex: 1, height: "100%", paddingVertical: 0, color: Colors.text, fontSize: 14 },
 	filterButton: {
 		width: 48,
@@ -57,6 +65,8 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		backgroundColor: Colors.surface,
+		borderWidth: StyleSheet.hairlineWidth,
+		borderColor: "rgba(46, 46, 46, 0.1)",
 	},
-	activeFilterButton: { backgroundColor: Colors.primary },
+	activeFilterButton: { backgroundColor: Colors.primary, borderColor: Colors.primary },
 });

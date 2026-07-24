@@ -15,6 +15,7 @@ export const Colors = {
 	text: "#2E2E2E",
 	icon: "#2E2E2E",
 	border: "#A9BFA7",
+	borderSoft: "rgba(220, 201, 166, 0.42)",
 	tabIconDefault: "#A9BFA7",
 	tabIconSelected: "#7F9C7A",
 };

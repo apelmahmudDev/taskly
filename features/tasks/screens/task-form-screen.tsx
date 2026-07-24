@@ -1,8 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Input } from "@/components/ui/input";
 import { Colors } from "@/constants/theme";
 import { TASKS } from "@/features/tasks/data/tasks";
 import type { TaskFormScreenProps } from "@/navigation/navigation-types";
@@ -37,40 +38,31 @@ export function TaskFormScreen({ navigation, route }: TaskFormScreenProps) {
 				keyboardShouldPersistTaps="handled"
 			>
 				<Field label="Title">
-					<TextInput
+					<Input
 						value={title}
 						onChangeText={setTitle}
 						placeholder="Task title"
-						placeholderTextColor={Colors.primarySoft}
-						style={styles.input}
 					/>
 				</Field>
 				<Field label="Description">
-					<TextInput
+					<Input
 						value={description}
 						onChangeText={setDescription}
 						placeholder="Task description"
-						placeholderTextColor={Colors.primarySoft}
 						multiline
-						style={[styles.input, styles.descriptionInput]}
+						style={styles.descriptionInput}
 					/>
 				</Field>
 				<Field label="Category">
-					<TextInput
+					<Input
 						value={category}
 						onChangeText={setCategory}
-						placeholder="Category"
-						placeholderTextColor={Colors.primarySoft}
-						style={styles.input}
 					/>
 				</Field>
 				<Field label="Due date">
-					<TextInput
+					<Input
 						value={dueDate}
 						onChangeText={setDueDate}
-						placeholder="May 15, 2025"
-						placeholderTextColor={Colors.primarySoft}
-						style={styles.input}
 					/>
 				</Field>
 				<Pressable
