@@ -4,8 +4,8 @@ import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
-import { TASKS } from "@/data/tasks";
-import type { TaskFormScreenProps } from "@/navigation/types";
+import { TASKS } from "@/features/tasks/data/tasks";
+import type { TaskFormScreenProps } from "@/navigation/navigation-types";
 import { styles } from "./task-form-screen.styles";
 
 export function TaskFormScreen({ navigation, route }: TaskFormScreenProps) {

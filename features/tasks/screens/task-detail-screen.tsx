@@ -4,8 +4,8 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
-import { TASKS } from "@/data/tasks";
-import type { TaskDetailScreenProps } from "@/navigation/types";
+import { TASKS } from "@/features/tasks/data/tasks";
+import type { TaskDetailScreenProps } from "@/navigation/navigation-types";
 import { styles } from "./task-detail-screen.styles";
 
 export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {

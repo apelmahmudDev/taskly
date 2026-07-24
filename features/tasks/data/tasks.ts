@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/theme";
-import type { TaskItem } from "@/types/task";
+import type { TaskItem } from "../types";
 
 export const TASKS: TaskItem[] = [
 	{

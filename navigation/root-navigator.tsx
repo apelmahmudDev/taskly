@@ -4,11 +4,11 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
-import { CategoriesScreen } from "@/screens/categories/categories-screen";
-import { TaskDetailScreen } from "@/screens/task-detail/task-detail-screen";
-import { TaskFormScreen } from "@/screens/task-form/task-form-screen";
-import { TasksScreen } from "@/screens/tasks/tasks-screen";
-import type { MainTabParamList, RootStackParamList } from "./types";
+import { CategoriesScreen } from "@/features/categories/screens/categories-screen";
+import { TaskDetailScreen } from "@/features/tasks/screens/task-detail-screen";
+import { TaskFormScreen } from "@/features/tasks/screens/task-form-screen";
+import { TaskListScreen } from "@/features/tasks/screens/task-list-screen";
+import type { MainTabParamList, RootStackParamList } from "./navigation-types";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -40,7 +40,7 @@ function MainTabs() {
 				),
 			})}
 		>
-			<Tab.Screen name="Tasks" component={TasksScreen} />
+			<Tab.Screen name="Tasks" component={TaskListScreen} />
 			<Tab.Screen name="Categories" component={CategoriesScreen} />
 		</Tab.Navigator>
 	);

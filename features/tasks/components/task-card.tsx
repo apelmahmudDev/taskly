@@ -3,7 +3,7 @@ import { memo } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
-import type { TaskItem } from "@/types/task";
+import type { TaskItem } from "../types";
 import { styles } from "./task-card.styles";
 
 type TaskCardProps = {
