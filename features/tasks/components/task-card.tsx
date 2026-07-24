@@ -1,10 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { memo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
 import type { TaskItem } from "../types";
-import { styles } from "./task-card.styles";
 
 type TaskCardProps = {
 	task: TaskItem;
@@ -13,7 +12,12 @@ type TaskCardProps = {
 	onToggleStar: () => void;
 };
 
-function TaskCardComponent({ task, onPress, onToggle, onToggleStar }: TaskCardProps) {
+function TaskCardComponent({
+	task,
+	onPress,
+	onToggle,
+	onToggleStar,
+}: TaskCardProps) {
 	return (
 		<View style={styles.card}>
 			<Pressable
@@ -23,21 +27,50 @@ function TaskCardComponent({ task, onPress, onToggle, onToggleStar }: TaskCardPr
 				onPress={onToggle}
 				style={[styles.checkbox, task.completed && styles.checkedBox]}
 			>
-				{task.completed && <Ionicons name="checkmark" size={15} color={Colors.background} />}
+				{task.completed && (
+					<Ionicons name="checkmark" size={15} color={Colors.background} />
+				)}
 			</Pressable>
 
-			<Pressable accessibilityRole="button" accessibilityLabel={`Open ${task.title}`} onPress={onPress} style={styles.details}>
-				<Text numberOfLines={1} style={[styles.title, task.completed && styles.completedTitle]}>{task.title}</Text>
+			<Pressable
+				accessibilityRole="button"
+				accessibilityLabel={`Open ${task.title}`}
+				onPress={onPress}
+				style={styles.details}
+			>
+				<Text
+					numberOfLines={1}
+					style={[styles.title, task.completed && styles.completedTitle]}
+				>
+					{task.title}
+				</Text>
 				<View style={styles.metaRow}>
-					<View style={[styles.categoryDot, { backgroundColor: task.categoryColor }]} />
 					<Text style={styles.category}>{task.category}</Text>
 				</View>
 			</Pressable>
 
 			<View style={styles.endContent}>
-				<Text style={[styles.due, task.urgent && styles.urgentDue]}>{task.due}</Text>
-				<Pressable accessibilityLabel={task.starred ? "Remove from starred" : "Add to starred"} hitSlop={10} onPress={onToggleStar}>
-					<Ionicons name={task.starred ? "star" : "star-outline"} size={22} color={task.starred ? (task.urgent ? Colors.danger : Colors.primary) : Colors.icon} />
+				<Text style={[styles.due, task.urgent && styles.urgentDue]}>
+					{task.due}
+				</Text>
+				<Pressable
+					accessibilityLabel={
+						task.starred ? "Remove from starred" : "Add to starred"
+					}
+					hitSlop={10}
+					onPress={onToggleStar}
+				>
+					<Ionicons
+						name={task.starred ? "star" : "star-outline"}
+						size={22}
+						color={
+							task.starred
+								? task.urgent
+									? Colors.danger
+									: Colors.primary
+								: Colors.icon
+						}
+					/>
 				</Pressable>
 			</View>
 		</View>
@@ -45,3 +78,50 @@ function TaskCardComponent({ task, onPress, onToggle, onToggleStar }: TaskCardPr
 }
 
 export const TaskCard = memo(TaskCardComponent);
+
+const styles = StyleSheet.create({
+	card: {
+		minHeight: 70,
+		marginBottom: 8,
+		paddingHorizontal: 14,
+		paddingVertical: 12,
+		borderRadius: 14,
+		backgroundColor: Colors.surface,
+		flexDirection: "row",
+		alignItems: "center",
+		shadowColor: Colors.text,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.08,
+		shadowRadius: 5,
+		elevation: 2,
+	},
+	checkbox: {
+		width: 22,
+		height: 22,
+		borderRadius: 11,
+		borderWidth: 1.5,
+		borderColor: Colors.primary,
+		alignItems: "center",
+		justifyContent: "center",
+		marginRight: 12,
+	},
+	checkedBox: { borderColor: Colors.primary, backgroundColor: Colors.primary },
+	details: { flex: 1, minWidth: 0 },
+	title: {
+		color: Colors.text,
+		fontSize: 14,
+		lineHeight: 20,
+		fontWeight: "700",
+	},
+	completedTitle: { color: Colors.icon },
+	metaRow: { flexDirection: "row", alignItems: "center", gap: 5, marginTop: 2 },
+	category: { color: Colors.icon, fontSize: 10 },
+	endContent: {
+		marginLeft: 8,
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 10,
+	},
+	due: { color: Colors.primary, fontSize: 9, fontWeight: "700" },
+	urgentDue: { color: Colors.danger },
+});

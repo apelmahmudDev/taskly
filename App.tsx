@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { Colors } from "@/constants/theme";
 import { navigationTheme } from "@/navigation/navigation-theme";
 import { RootNavigator } from "@/navigation/root-navigator";
 import { store } from "@/store";
@@ -10,7 +11,9 @@ import { store } from "@/store";
 export default function App() {
 	return (
 		<Provider store={store}>
-			<SafeAreaProvider>
+			<SafeAreaProvider
+				style={{ flex: 1, backgroundColor: Colors.background }}
+			>
 				<NavigationContainer theme={navigationTheme}>
 					<RootNavigator />
 					<StatusBar style="dark" />
