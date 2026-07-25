@@ -5,6 +5,7 @@ import DateTimePicker, {
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import {
+	ActivityIndicator,
 	Alert,
 	Modal,
 	Platform,
@@ -205,6 +206,9 @@ export function TaskFormScreen({ navigation, route }: TaskFormScreenProps) {
 						pressed && styles.pressed,
 					]}
 				>
+					{isLoading && (
+						<ActivityIndicator size="small" color={Colors.background} />
+					)}
 					<Text style={styles.saveButtonText}>
 						{isLoading
 							? "Saving…"

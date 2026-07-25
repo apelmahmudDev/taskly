@@ -85,8 +85,10 @@ export const styles = StyleSheet.create({
 		height: 50,
 		marginTop: 8,
 		borderRadius: 12,
+		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "center",
+		gap: 8,
 		backgroundColor: Colors.primary,
 	},
 	saveButtonText: {

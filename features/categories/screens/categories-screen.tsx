@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import {
+	ActivityIndicator,
 	Alert,
 	FlatList,
 	Pressable,
@@ -70,7 +71,11 @@ export function CategoriesScreen() {
 						(isLoading || !name.trim()) && styles.disabledButton,
 					]}
 				>
-					<Ionicons name="add" size={24} color={Colors.background} />
+					{isLoading ? (
+						<ActivityIndicator size="small" color={Colors.background} />
+					) : (
+						<Ionicons name="add" size={24} color={Colors.background} />
+					)}
 				</Pressable>
 			</View>
 			<FlatList
