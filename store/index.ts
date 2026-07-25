@@ -1,14 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { api } from "./services/api";
-import { counterSlice } from "./slices/counterSlice";
-import { tasksSlice } from "./slices/tasks-slice";
 import { categoriesSlice } from "./slices/categories-slice";
+import { tasksSlice } from "./slices/tasks-slice";
 
 export const createStore = () =>
 	configureStore({
 		reducer: {
 			[api.reducerPath]: api.reducer,
-			[counterSlice.name]: counterSlice.reducer,
 			[tasksSlice.name]: tasksSlice.reducer,
 			[categoriesSlice.name]: categoriesSlice.reducer,
 		},
