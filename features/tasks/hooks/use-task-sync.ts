@@ -8,15 +8,10 @@ import { useLazyGetCategoriesQuery } from "@/store/services/categories-api";
 import { useLazyGetTasksQuery } from "@/store/services/tasks-api";
 import { setCategories } from "@/store/slices/categories-slice";
 import { setRemoteTasks } from "@/store/slices/tasks-slice";
+import { getMutationErrorMessage } from "@/utils/get-mutation-error-message";
 import { mergeRemoteTasks } from "../utils/task-mapper";
 
 type RefreshMode = "background" | "pull";
-
-function getRefreshErrorMessage(error: unknown) {
-	return typeof error === "object" && error && "error" in error
-		? String(error.error)
-		: "Your cached tasks are still available. Please try again.";
-}
 
 export function useTaskSync() {
 	const dispatch = useAppDispatch();
@@ -67,7 +62,13 @@ export function useTaskSync() {
 				await dispatch(persistCache()).unwrap();
 			} catch (error) {
 				if (mode === "pull") {
-					Alert.alert("Could not refresh tasks", getRefreshErrorMessage(error));
+					Alert.alert(
+						"Could not refresh tasks",
+						getMutationErrorMessage(
+							error,
+							"Your cached tasks are still available. Please try again.",
+						),
+					);
 				}
 			} finally {
 				setRefreshMode(null);

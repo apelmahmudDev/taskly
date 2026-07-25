@@ -27,6 +27,7 @@ import {
 	useEditTaskMutation,
 } from "@/store/services/tasks-api";
 import { addTask, updateTask } from "@/store/slices/tasks-slice";
+import { getMutationErrorMessage } from "@/utils/get-mutation-error-message";
 import { FilterChip } from "../components/filter-chip";
 import { styles } from "./task-form-screen.styles";
 
@@ -91,13 +92,9 @@ export function TaskFormScreen({ navigation, route }: TaskFormScreenProps) {
 			await dispatch(persistCache()).unwrap();
 			navigation.goBack();
 		} catch (error) {
-			const message =
-				typeof error === "object" && error && "error" in error
-					? String(error.error)
-					: "Please try again.";
 			Alert.alert(
 				existingTask ? "Could not update task" : "Could not create task",
-				message,
+				getMutationErrorMessage(error),
 			);
 		}
 	};

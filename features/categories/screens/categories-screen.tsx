@@ -30,15 +30,10 @@ import {
 	clearTaskCategory,
 	renameTaskCategory,
 } from "@/store/slices/tasks-slice";
+import { getMutationErrorMessage } from "@/utils/get-mutation-error-message";
 import type { Category } from "@/features/tasks/types";
 import { CategoryCard } from "../components/category-card";
 import { RenameCategoryModal } from "../components/rename-category-modal";
-
-function mutationErrorMessage(error: unknown) {
-	return typeof error === "object" && error && "error" in error
-		? String(error.error)
-		: "Please try again.";
-}
 
 export function CategoriesScreen() {
 	const dispatch = useAppDispatch();
@@ -76,7 +71,7 @@ export function CategoriesScreen() {
 			setName("");
 			Keyboard.dismiss();
 		} catch (error) {
-			Alert.alert("Could not add category", mutationErrorMessage(error));
+			Alert.alert("Could not add category", getMutationErrorMessage(error));
 		}
 	};
 
@@ -114,7 +109,7 @@ export function CategoriesScreen() {
 			await dispatch(persistCache()).unwrap();
 			setCategoryToRename(null);
 		} catch (error) {
-			Alert.alert("Could not rename category", mutationErrorMessage(error));
+			Alert.alert("Could not rename category", getMutationErrorMessage(error));
 		}
 	};
 
@@ -126,7 +121,7 @@ export function CategoriesScreen() {
 			dispatch(clearTaskCategory(category.id));
 			await dispatch(persistCache()).unwrap();
 		} catch (error) {
-			Alert.alert("Could not delete category", mutationErrorMessage(error));
+			Alert.alert("Could not delete category", getMutationErrorMessage(error));
 		} finally {
 			setDeletingCategoryId(null);
 		}

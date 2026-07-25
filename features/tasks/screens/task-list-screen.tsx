@@ -10,6 +10,7 @@ import type { TasksScreenProps } from "@/navigation/navigation-types";
 import { persistCache } from "@/store/persistence/cache";
 import { useSetTaskCompletedMutation } from "@/store/services/tasks-api";
 import { toggleStar, updateTask } from "@/store/slices/tasks-slice";
+import { getMutationErrorMessage } from "@/utils/get-mutation-error-message";
 import { AdvancedFiltersModal } from "../components/advanced-filters-modal";
 import { TaskCard } from "../components/task-card";
 import { TaskFilterBar } from "../components/task-filter-bar";
@@ -63,11 +64,7 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 				dispatch(updateTask(updatedTask));
 				await dispatch(persistCache()).unwrap();
 			} catch (error) {
-				const message =
-					typeof error === "object" && error && "error" in error
-						? String(error.error)
-						: "Please try again.";
-				Alert.alert("Could not update task", message);
+			Alert.alert("Could not update task", getMutationErrorMessage(error));
 			} finally {
 				setPendingTaskIds((current) => {
 					const next = new Set(current);

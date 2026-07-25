@@ -24,6 +24,7 @@ import {
 	updateTask,
 } from "@/store/slices/tasks-slice";
 import { formatDate, formatDateTime } from "@/utils/format-date";
+import { getMutationErrorMessage } from "@/utils/get-mutation-error-message";
 import { styles } from "./task-detail-screen.styles";
 
 export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
@@ -53,11 +54,7 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 			await dispatch(persistCache()).unwrap();
 			navigation.goBack();
 		} catch (error) {
-			const message =
-				typeof error === "object" && error && "error" in error
-					? String(error.error)
-					: "Please try again.";
-			Alert.alert("Could not delete task", message);
+			Alert.alert("Could not delete task", getMutationErrorMessage(error));
 		}
 	};
 
@@ -70,11 +67,7 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 			dispatch(updateTask(updatedTask));
 			await dispatch(persistCache()).unwrap();
 		} catch (error) {
-			const message =
-				typeof error === "object" && error && "error" in error
-					? String(error.error)
-					: "Please try again.";
-			Alert.alert("Could not update task", message);
+			Alert.alert("Could not update task", getMutationErrorMessage(error));
 		}
 	};
 
