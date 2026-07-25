@@ -1,6 +1,17 @@
 # Taskly
 
+[![Expo SDK 54](https://img.shields.io/badge/EXPO-SDK%2054-4630EB?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
+[![Supabase](https://img.shields.io/badge/SUPABASE-BACKEND-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Download APK](https://img.shields.io/badge/ANDROID-DOWNLOAD%20APK-7F9C7A?style=for-the-badge&logo=android&logoColor=white)](YOUR_APK_LINK_HERE) <!-- Replace YOUR_APK_LINK_HERE with the public APK URL. -->
+
 Taskly is an Expo SDK 54 task manager backed by Supabase. It uses React Navigation, Redux Toolkit, RTK Query, and a versioned AsyncStorage cache to provide backend-backed task management with offline reading.
+
+## Features
+
+- Create, edit, complete, reopen, delete, and star tasks
+- Organize tasks with categories
+- Search, filter, and sort tasks
+- Read cached tasks offline and refresh when online
 
 ## Setup
 
@@ -42,30 +53,30 @@ Taskly is an Expo SDK 54 task manager backed by Supabase. It uses React Navigati
 
 ## Backend schema and seed data
 
-Open the Supabase SQL Editor and run [`supabase/schema.sql`](supabase/schema.sql). The script enables `pgcrypto`, creates the `categories` and `tasks` tables, enables row-level security, and adds the policies and grants needed by the unauthenticated assessment client.
+Run [`supabase/schema.sql`](supabase/schema.sql) in the Supabase SQL Editor.
 
-The schema contains:
+### Table schema
 
-- `categories`: UUID primary key, unique name, and optional color.
-- `tasks`: UUID primary key, title, description, optional category reference, optional due date, completion status, created time, and updated time.
-- The task-to-category foreign key uses `on delete set null`, so deleting a category does not delete its tasks.
-- `starred` is intentionally absent because it is a device-local field.
+| Table        | Columns                                                                                                                                               |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `categories` | `id` (UUID primary key), `name` (unique text), `color` (optional text)                                                                                |
+| `tasks`      | `id` (UUID primary key), `title`, `description`, `category_id` (optional foreign key), `due_date` (optional), `completed`, `created_at`, `updated_at` |
 
-The same SQL file seeds three categories (`Work`, `Personal`, and `Health`) and eight tasks. Category inserts use `on conflict (name) do nothing`, and task seed rows are inserted only when the tasks table is empty. This makes the setup safe to rerun without repeatedly duplicating the supplied seed data.
+`tasks.category_id` references `categories.id` with `on delete set null`. `starred` is local-only and is not stored in Supabase.
 
-The included RLS policies allow anonymous read/write access only to support the assessment's no-authentication scope. They are not appropriate for a production multi-user application.
+The script seeds 3 categories (`Work`, `Personal`, `Health`) and 8 tasks. It is safe to rerun: categories use `on conflict do nothing`, and tasks seed only when the table is empty.
 
 ## Local storage choice
 
-Taskly uses AsyncStorage with the versioned key `taskly.cache.v1`. The cached object contains its schema version, tasks, categories, device-local starred values, and the last successful refresh timestamp. AsyncStorage is appropriate here because the cache is small, JSON-shaped, and only needs simple whole-document hydration and persistence. The application reads this cache before contacting Supabase so previously downloaded tasks appear immediately and remain available when the device is offline or a refresh fails.
+Taskly uses AsyncStorage (`taskly.cache.v1`) because the cache is small and JSON-shaped. It stores tasks, categories, local starred values, and the last refresh time; cached data renders first and remains available offline.
 
 ## State management choice
 
-Redux Toolkit provides predictable local application state for hydrated tasks, categories, starred values, cache hydration, and the last refresh timestamp. RTK Query is configured with `fakeBaseQuery` because Supabase requests are made through the Supabase JavaScript SDK; task and category endpoint files inject their queries and mutations into one root API. Transient screen controls such as the current search text and open filter modal remain local to the screen. Backend writes are not optimistic: the app waits for Supabase success, updates the Redux slice, and then persists the new state to AsyncStorage.
+Taskly uses Redux Toolkit for cached tasks, categories, starred values, and sync metadata. RTK Query wraps Supabase requests, while screen-only state stays local; this keeps cached, remote, and UI state clearly separated. Redux Toolkit was chosen because the app needs predictable shared state across screens and cache updates.
 
 ## Preserving starred tasks during refresh
 
-`starred` is stored only in the local task cache and is never sent to Supabase. During a successful backend refresh, `mergeRemoteTasks` builds a map from cached task IDs to their starred values. Each downloaded task is then combined with the matching local value; tasks that were not previously cached receive `starred: false`. Only after this merge does the app update Redux and AsyncStorage, so refreshing backend data cannot erase the user's device-local stars.
+`starred` is stored only in AsyncStorage and is never sent to Supabase. On refresh, [`mergeRemoteTasks`](utils/task-mapper.ts) restores each cached star by task ID; new tasks default to `false`.
 
 ## Testing approach
 
@@ -82,6 +93,12 @@ The tests focus on deterministic business rules where a regression would be easy
 - The refresh merge test verifies that cached starred values survive a backend refresh and that newly downloaded tasks default to unstarred.
 
 These are unit tests rather than live Supabase tests, so they are fast, repeatable, and do not require network access or test database credentials.
+
+## AI usage
+
+AI was used for requirement clarification, folder-structure suggestions, debugging ideas, and improving documentation.
+
+The project architecture, UI, state management, navigation, task features, offline handling, and final implementation were built from scratch. All AI suggestions were reviewed and adjusted before use.
 
 ## Known limitations
 
