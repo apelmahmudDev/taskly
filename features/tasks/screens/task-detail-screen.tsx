@@ -212,7 +212,7 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 						pressed && styles.pressed,
 					]}
 				>
-					<Ionicons name="pencil-outline" size={19} color={Colors.text} />
+					<Ionicons name="create" size={21} color={Colors.text} />
 					<Text style={styles.secondaryActionText}>Edit Task</Text>
 				</Pressable>
 

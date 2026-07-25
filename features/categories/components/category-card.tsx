@@ -37,7 +37,7 @@ function CategoryCardComponent({
 				accessibilityLabel={`Rename ${name}`}
 				style={styles.action}
 			>
-				<Ionicons name="pencil-outline" size={18} color={Colors.primary} />
+				<Ionicons name="create" size={21} color={Colors.primary} />
 			</Pressable>
 			<Pressable
 				onPress={onDelete}
