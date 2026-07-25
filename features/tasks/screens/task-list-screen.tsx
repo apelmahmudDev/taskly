@@ -44,9 +44,12 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 	} = useAppSelector((state) => state.tasks);
 	const categories = useAppSelector((state) => state.categories.items);
 	const [isOnline, setIsOnline] = useState(true);
-	const [getTasks, tasksRequest] = useLazyGetTasksQuery();
+	const [getTasks] = useLazyGetTasksQuery();
 	const [getCategories] = useLazyGetCategoriesQuery();
 	const [setTaskCompleted] = useSetTaskCompletedMutation();
+	const [refreshMode, setRefreshMode] = useState<"background" | "pull" | null>(
+		null,
+	);
 	const [pendingTaskIds, setPendingTaskIds] = useState<Set<string>>(
 		() => new Set(),
 	);
@@ -67,10 +70,24 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 			),
 		[],
 	);
-	useEffect(() => {
-		if (!hydrated || !isOnline) return;
-		void Promise.all([getTasks().unwrap(), getCategories().unwrap()])
-			.then(([remoteTasks, remoteCategories]) => {
+	const refreshFromBackend = useCallback(
+		async (mode: "background" | "pull") => {
+			if (!isOnline) {
+				if (mode === "pull") {
+					Alert.alert(
+						"You're offline",
+						"Connect to the internet to refresh your tasks.",
+					);
+				}
+				return;
+			}
+
+			setRefreshMode(mode);
+			try {
+				const [remoteTasks, remoteCategories] = await Promise.all([
+					getTasks().unwrap(),
+					getCategories().unwrap(),
+				]);
 				dispatch(
 					setRemoteTasks({
 						tasks: mergeRemoteTasks(remoteTasks, tasksRef.current),
@@ -78,10 +95,26 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 					}),
 				);
 				dispatch(setCategories(remoteCategories));
-				dispatch(persistCache());
-			})
-			.catch(() => undefined);
-	}, [dispatch, getCategories, getTasks, hydrated, isOnline]);
+				await dispatch(persistCache()).unwrap();
+			} catch (error) {
+				if (mode === "pull") {
+					const message =
+						typeof error === "object" && error && "error" in error
+							? String(error.error)
+							: "Your cached tasks are still available. Please try again.";
+					Alert.alert("Could not refresh tasks", message);
+				}
+			} finally {
+				setRefreshMode(null);
+			}
+		},
+		[dispatch, getCategories, getTasks, isOnline],
+	);
+
+	useEffect(() => {
+		if (!hydrated || !isOnline) return;
+		void refreshFromBackend("background");
+	}, [hydrated, isOnline, refreshFromBackend]);
 
 	const visibleTasks = useMemo(
 		() =>
@@ -140,7 +173,7 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 	return (
 		<SafeAreaView style={styles.safeArea} edges={["top"]}>
 			<TaskListHeader isOnline={isOnline} />
-			{tasksRequest.isFetching && (
+			{refreshMode === "background" && (
 				<ActivityIndicator
 					accessibilityLabel="Refreshing tasks"
 					color={Colors.primary}
@@ -159,6 +192,8 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 			/>
 			<FlatList
 				data={visibleTasks}
+				refreshing={refreshMode === "pull"}
+				onRefresh={() => void refreshFromBackend("pull")}
 				renderItem={renderTask}
 				keyExtractor={(item) => item.id}
 				style={styles.taskList}
