@@ -135,5 +135,6 @@ export const styles = StyleSheet.create({
 	},
 	secondaryActionText: { color: Colors.text, fontSize: 14, fontWeight: "700" },
 	deleteActionText: { color: Colors.danger, fontSize: 14, fontWeight: "700" },
+	disabledAction: { opacity: 0.5 },
 	pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
 });

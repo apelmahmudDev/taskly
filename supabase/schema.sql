@@ -34,6 +34,7 @@ drop policy if exists "assessment categories insert" on public.categories;
 drop policy if exists "assessment tasks read" on public.tasks;
 drop policy if exists "assessment tasks insert" on public.tasks;
 drop policy if exists "assessment tasks update" on public.tasks;
+drop policy if exists "assessment tasks delete" on public.tasks;
 
 create policy "assessment categories read"
   on public.categories
@@ -60,6 +61,11 @@ create policy "assessment tasks update"
   for update
   using (true)
   with check (true);
+
+create policy "assessment tasks delete"
+  on public.tasks
+  for delete
+  using (true);
 
 
 insert into public.categories (name, color)

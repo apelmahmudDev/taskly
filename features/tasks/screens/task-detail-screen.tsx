@@ -1,13 +1,14 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
 import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import type { TaskDetailScreenProps } from "@/navigation/navigation-types";
 import { persistCache } from "@/store/persistence/cache";
-import { toggleStar } from "@/store/slices/tasks-slice";
+import { useDeleteTaskMutation } from "@/store/services/tasks-api";
+import { removeTask, toggleStar } from "@/store/slices/tasks-slice";
 import { formatDate, formatDateTime } from "@/utils/format-date";
 import { styles } from "./task-detail-screen.styles";
 
@@ -20,6 +21,7 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 
 	const [completed, setCompleted] = useState(Boolean(task?.completed));
 	const [starred, setStarred] = useState(Boolean(task?.starred));
+	const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
 
 	if (!task)
 		return (
@@ -27,6 +29,36 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 				<Text style={styles.title}>Task not found</Text>
 			</SafeAreaView>
 		);
+
+	const deleteConfirmedTask = async () => {
+		try {
+			await deleteTask(task.id).unwrap();
+			dispatch(removeTask(task.id));
+			await dispatch(persistCache()).unwrap();
+			navigation.goBack();
+		} catch (error) {
+			const message =
+				typeof error === "object" && error && "error" in error
+					? String(error.error)
+					: "Please try again.";
+			Alert.alert("Could not delete task", message);
+		}
+	};
+
+	const confirmDelete = () => {
+		Alert.alert(
+			"Delete task?",
+			`Are you sure you want to delete “${task.title}”? This cannot be undone.`,
+			[
+				{ text: "No", style: "cancel" },
+				{
+					text: "Yes",
+					style: "destructive",
+					onPress: () => void deleteConfirmedTask(),
+				},
+			],
+		);
+	};
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
@@ -142,13 +174,18 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 				</Pressable>
 
 				<Pressable
+					onPress={confirmDelete}
+					disabled={isDeleting}
 					style={({ pressed }) => [
 						styles.secondaryAction,
+						isDeleting && styles.disabledAction,
 						pressed && styles.pressed,
 					]}
 				>
 					<Ionicons name="trash-outline" size={19} color={Colors.danger} />
-					<Text style={styles.deleteActionText}>Delete Task</Text>
+					<Text style={styles.deleteActionText}>
+						{isDeleting ? "Deleting…" : "Delete Task"}
+					</Text>
 				</Pressable>
 			</ScrollView>
 		</SafeAreaView>

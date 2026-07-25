@@ -42,6 +42,9 @@ export const tasksSlice = createSlice({
 				};
 			}
 		},
+		removeTask(state, action: PayloadAction<string>) {
+			state.items = state.items.filter((task) => task.id !== action.payload);
+		},
 
 		toggleStar(state, action: PayloadAction<string>) {
 			const task = state.items.find((item) => item.id === action.payload);
@@ -63,5 +66,5 @@ export const tasksSlice = createSlice({
 			}),
 });
 
-export const { setRemoteTasks, addTask, updateTask, toggleStar } =
+export const { setRemoteTasks, addTask, updateTask, removeTask, toggleStar } =
 	tasksSlice.actions;

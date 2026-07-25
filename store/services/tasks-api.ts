@@ -69,6 +69,26 @@ export const tasksApi = api.injectEndpoints({
 				}
 			},
 		}),
+		deleteTask: builder.mutation<string, string>({
+			queryFn: async (id) => {
+				try {
+					const { data, error } = await getSupabase()
+						.from("tasks")
+						.delete()
+						.eq("id", id)
+						.select("id");
+					if (error) throw error;
+					if (!data || data.length === 0) {
+						throw new Error(
+							"We couldn't find this task. Refresh your task list and try again.",
+						);
+					}
+					return { data: String(data[0].id) };
+				} catch (error) {
+					return toQueryError(error);
+				}
+			},
+		}),
 	}),
 	overrideExisting: false,
 });
@@ -77,4 +97,5 @@ export const {
 	useLazyGetTasksQuery,
 	useCreateTaskMutation,
 	useEditTaskMutation,
+	useDeleteTaskMutation,
 } = tasksApi;
