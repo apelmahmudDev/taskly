@@ -15,13 +15,13 @@ import { AdvancedFiltersModal } from "../components/advanced-filters-modal";
 import { TaskCard } from "../components/task-card";
 import { TaskFilterBar } from "../components/task-filter-bar";
 import { TaskListHeader } from "../components/task-list-header";
-import { useTaskSync } from "../hooks/use-task-sync";
-import type { TaskItem } from "../types";
+import { useTaskSync } from "@/hooks/use-task-sync";
+import type { TaskItem } from "@/types/task";
 import {
 	selectVisibleTasks,
 	type TaskSortOption,
 	type TaskStatusFilter,
-} from "../utils/filter-and-sort-tasks";
+} from "@/utils/filter-and-sort-tasks";
 
 export function TaskListScreen({ navigation }: TasksScreenProps) {
 	const dispatch = useAppDispatch();

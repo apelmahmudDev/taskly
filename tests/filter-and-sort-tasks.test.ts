@@ -1,5 +1,5 @@
-import type { TaskItem } from "@/features/tasks/types";
-import { selectVisibleTasks } from "@/features/tasks/utils/filter-and-sort-tasks";
+import type { TaskItem } from "@/types/task";
+import { selectVisibleTasks } from "@/utils/filter-and-sort-tasks";
 
 const tasks: TaskItem[] = [
 	{

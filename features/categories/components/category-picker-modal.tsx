@@ -3,7 +3,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Button } from "@/components/ui/button";
 import { Colors } from "@/constants/theme";
-import type { Category } from "@/features/tasks/types";
+import type { Category } from "@/types/task";
 
 type CategoryPickerModalProps = {
 	visible: boolean;

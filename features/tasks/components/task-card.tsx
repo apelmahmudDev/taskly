@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
 import { formatDate } from "@/utils/format-date";
-import type { TaskItem } from "../types";
+import type { TaskItem } from "@/types/task";
 
 type TaskCardProps = {
 	task: TaskItem;

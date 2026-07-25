@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-import type { Category, TaskItem } from "@/features/tasks/types";
+import type { Category, TaskItem } from "@/types/task";
 import type { RootState } from "@/store";
 
 const CACHE_KEY = "taskly.cache.v1";

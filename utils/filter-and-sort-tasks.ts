@@ -1,4 +1,4 @@
-import type { TaskItem } from "../types";
+import type { TaskItem } from "@/types/task";
 
 export type TaskStatusFilter = "All" | "Open" | "Done";
 export type TaskSortOption = "Due date" | "Created time";

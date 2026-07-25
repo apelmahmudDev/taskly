@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Modal, Pressable, Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
-import type { TaskSortOption, TaskStatusFilter } from "../utils/filter-and-sort-tasks";
+import type { TaskSortOption, TaskStatusFilter } from "@/utils/filter-and-sort-tasks";
 import { styles } from "./advanced-filters-modal.styles";
 import { FilterChip } from "./filter-chip";
 

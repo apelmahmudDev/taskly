@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/theme";
-import { mapTaskRow } from "@/features/tasks/utils/task-mapper";
+import { mapTaskRow } from "@/utils/task-mapper";
 
 describe("mapTaskRow", () => {
 	it("maps a Supabase task row and applies local defaults", () => {

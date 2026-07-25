@@ -1,4 +1,4 @@
-import type { Category } from "@/features/tasks/types";
+import type { Category } from "@/types/task";
 import { getSupabase } from "@/lib/supabase";
 import { api } from "./api";
 import { toQueryError } from "./api-error";

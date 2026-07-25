@@ -1,5 +1,5 @@
-import type { EditTaskInput, TaskInput, TaskItem } from "@/features/tasks/types";
-import { mapTaskRow } from "@/features/tasks/utils/task-mapper";
+import type { EditTaskInput, TaskInput, TaskItem } from "@/types/task";
+import { mapTaskRow } from "@/utils/task-mapper";
 import { getSupabase } from "@/lib/supabase";
 import { api } from "./api";
 import { toQueryError } from "./api-error";

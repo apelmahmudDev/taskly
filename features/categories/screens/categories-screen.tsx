@@ -30,8 +30,8 @@ import {
 	clearTaskCategory,
 	renameTaskCategory,
 } from "@/store/slices/tasks-slice";
+import type { Category } from "@/types/task";
 import { getMutationErrorMessage } from "@/utils/get-mutation-error-message";
-import type { Category } from "@/features/tasks/types";
 import { CategoryCard } from "../components/category-card";
 import { RenameCategoryModal } from "../components/rename-category-modal";
 
@@ -44,13 +44,18 @@ export function CategoriesScreen() {
 		useRenameCategoryMutation();
 	const [deleteCategory] = useDeleteCategoryMutation();
 	const [name, setName] = useState("");
-	const [categoryToRename, setCategoryToRename] = useState<Category | null>(null);
+	const [categoryToRename, setCategoryToRename] = useState<Category | null>(
+		null,
+	);
 	const [renameName, setRenameName] = useState("");
-	const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+	const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(
+		null,
+	);
 	const taskCounts = useMemo(() => {
 		const counts: Record<string, number> = {};
 		for (const task of tasks) {
-			if (task.categoryId) counts[task.categoryId] = (counts[task.categoryId] ?? 0) + 1;
+			if (task.categoryId)
+				counts[task.categoryId] = (counts[task.categoryId] ?? 0) + 1;
 		}
 		return counts;
 	}, [tasks]);
@@ -91,7 +96,10 @@ export function CategoriesScreen() {
 					item.name.toLowerCase() === trimmedName.toLowerCase(),
 			)
 		) {
-			Alert.alert("Category already exists", "Choose a different category name.");
+			Alert.alert(
+				"Category already exists",
+				"Choose a different category name.",
+			);
 			return;
 		}
 		if (trimmedName === categoryToRename.name) {
@@ -105,7 +113,9 @@ export function CategoriesScreen() {
 				name: trimmedName,
 			}).unwrap();
 			dispatch(updateCategory(updated));
-			dispatch(renameTaskCategory({ categoryId: updated.id, name: updated.name }));
+			dispatch(
+				renameTaskCategory({ categoryId: updated.id, name: updated.name }),
+			);
 			await dispatch(persistCache()).unwrap();
 			setCategoryToRename(null);
 		} catch (error) {
@@ -132,14 +142,14 @@ export function CategoriesScreen() {
 		const detail = taskCount
 			? ` ${taskCount} ${taskCount === 1 ? "task" : "tasks"} will become Uncategorized.`
 			: "";
-		Alert.alert(
-			"Delete category?",
-			`Delete “${category.name}”?${detail}`,
-			[
-				{ text: "No", style: "cancel" },
-				{ text: "Yes", style: "destructive", onPress: () => void handleDeleteCategory(category) },
-			],
-		);
+		Alert.alert("Delete category?", `Delete “${category.name}”?${detail}`, [
+			{ text: "No", style: "cancel" },
+			{
+				text: "Yes",
+				style: "destructive",
+				onPress: () => void handleDeleteCategory(category),
+			},
+		]);
 	};
 
 	return (
@@ -198,7 +208,10 @@ export function CategoriesScreen() {
 }
 
 const styles = StyleSheet.create({
-	safeArea: { flex: 1, backgroundColor: Colors.background },
+	safeArea: {
+		flex: 1,
+		backgroundColor: Colors.background,
+	},
 	title: {
 		paddingHorizontal: 22,
 		paddingTop: 20,
@@ -229,6 +242,11 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		backgroundColor: Colors.primary,
 	},
-	disabledButton: { opacity: 0.5 },
-	list: { padding: 18, gap: 10 },
+	disabledButton: {
+		opacity: 0.5,
+	},
+	list: {
+		padding: 18,
+		gap: 10,
+	},
 });

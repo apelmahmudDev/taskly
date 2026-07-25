@@ -9,7 +9,7 @@ import { useLazyGetTasksQuery } from "@/store/services/tasks-api";
 import { setCategories } from "@/store/slices/categories-slice";
 import { setRemoteTasks } from "@/store/slices/tasks-slice";
 import { getMutationErrorMessage } from "@/utils/get-mutation-error-message";
-import { mergeRemoteTasks } from "../utils/task-mapper";
+import { mergeRemoteTasks } from "@/utils/task-mapper";
 
 type RefreshMode = "background" | "pull";
 

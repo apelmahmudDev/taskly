@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-import type { Category } from "@/features/tasks/types";
+import type { Category } from "@/types/task";
 import { hydrateCache } from "@/store/persistence/cache";
 
 type CategoriesState = { items: Category[] };

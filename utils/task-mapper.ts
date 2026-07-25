@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/theme";
-import type { TaskItem } from "../types";
+import type { TaskItem } from "@/types/task";
 
 type TaskRow = Record<string, unknown> & {
 	categories?: { id?: string; name?: string; color?: string } | null;

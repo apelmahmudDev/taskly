@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-import type { TaskItem } from "@/features/tasks/types";
+import type { TaskItem } from "@/types/task";
 import { hydrateCache } from "@/store/persistence/cache";
 
 type TasksState = {

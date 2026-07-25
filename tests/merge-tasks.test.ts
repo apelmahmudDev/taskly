@@ -1,5 +1,5 @@
-import type { TaskItem } from "@/features/tasks/types";
-import { mergeRemoteTasks } from "@/features/tasks/utils/task-mapper";
+import type { TaskItem } from "@/types/task";
+import { mergeRemoteTasks } from "@/utils/task-mapper";
 
 function task(id: string, starred = false): TaskItem {
 	return {
