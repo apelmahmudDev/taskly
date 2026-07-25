@@ -2,7 +2,7 @@
 
 [![Expo SDK 54](https://img.shields.io/badge/EXPO-SDK%2054-4630EB?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
 [![Supabase](https://img.shields.io/badge/SUPABASE-BACKEND-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
-[![Download APK](https://img.shields.io/badge/ANDROID-DOWNLOAD%20APK-7F9C7A?style=for-the-badge&logo=android&logoColor=white)](YOUR_APK_LINK_HERE) <!-- Replace YOUR_APK_LINK_HERE with the public APK URL. -->
+[![Download APK](https://img.shields.io/badge/ANDROID-DOWNLOAD%20APK-7F9C7A?style=for-the-badge&logo=android&logoColor=white)](<[YOUR_APK_LINK_HERE](https://drive.google.com/file/d/1SV5GUGB5ifPFcmVA0a3ykaoW2iyXMp9k/view?usp=sharing)>)
 
 Taskly is an Expo SDK 54 task manager backed by Supabase. It uses React Navigation, Redux Toolkit, RTK Query, and a versioned AsyncStorage cache to provide backend-backed task management with offline reading.
 
