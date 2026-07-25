@@ -108,9 +108,14 @@ export const styles = StyleSheet.create({
 		marginHorizontal: 14,
 		backgroundColor: Colors.border,
 	},
-	primaryAction: {
-		height: 48,
+	actionRow: {
 		marginTop: 30,
+		flexDirection: "row",
+		gap: 12,
+	},
+	primaryAction: {
+		flex: 1,
+		height: 48,
 		borderRadius: 11,
 		flexDirection: "row",
 		alignItems: "center",
@@ -120,12 +125,12 @@ export const styles = StyleSheet.create({
 	},
 	primaryActionText: {
 		color: Colors.background,
-		fontSize: 14,
+		fontSize: 12,
 		fontWeight: "700",
 	},
 	secondaryAction: {
+		flex: 1,
 		height: 48,
-		marginTop: 12,
 		borderRadius: 11,
 		flexDirection: "row",
 		alignItems: "center",
@@ -133,8 +138,7 @@ export const styles = StyleSheet.create({
 		gap: 10,
 		backgroundColor: Colors.surface,
 	},
-	secondaryActionText: { color: Colors.text, fontSize: 14, fontWeight: "700" },
-	deleteActionText: { color: Colors.danger, fontSize: 14, fontWeight: "700" },
+	secondaryActionText: { color: Colors.text, fontSize: 12, fontWeight: "700" },
 	disabledAction: { opacity: 0.5 },
 	pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
 });

@@ -119,16 +119,22 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 					>
 						<Ionicons
 							name={starred ? "star" : "star-outline"}
-							size={25}
+							size={20}
 							color={starred ? Colors.primary : Colors.text}
 						/>
 					</Pressable>
 					<Pressable
-						accessibilityLabel="More options"
+						accessibilityLabel="Delete task"
 						hitSlop={12}
+						onPress={confirmDelete}
+						disabled={isDeleting}
 						style={styles.headerButton}
 					>
-						<Ionicons name="ellipsis-vertical" size={23} color={Colors.text} />
+						{isDeleting ? (
+							<ActivityIndicator size="small" color={Colors.danger} />
+						) : (
+							<Ionicons name="trash-outline" size={20} color={Colors.danger} />
+						)}
 					</Pressable>
 				</View>
 			</View>
@@ -178,62 +184,46 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 					/>
 				</View>
 
-				<Pressable
-					onPress={() => void toggleTaskStatus()}
-					disabled={isUpdatingStatus}
-					style={({ pressed }) => [
-						styles.primaryAction,
-						isUpdatingStatus && styles.disabledAction,
-						pressed && styles.pressed,
-					]}
-				>
-					{isUpdatingStatus ? (
-						<ActivityIndicator size="small" color={Colors.background} />
-					) : (
-						<Ionicons
-							name={completed ? "arrow-undo-outline" : "checkmark"}
-							size={19}
-							color={Colors.background}
-						/>
-					)}
-					<Text style={styles.primaryActionText}>
-						{isUpdatingStatus
-							? "Updating…"
-							: completed
-								? "Mark as Open"
-								: "Mark as Complete"}
-					</Text>
-				</Pressable>
+				<View style={styles.actionRow}>
+					<Pressable
+						onPress={() => navigation.navigate("TaskForm", { taskId: task.id })}
+						style={({ pressed }) => [
+							styles.secondaryAction,
+							pressed && styles.pressed,
+						]}
+					>
+						<Ionicons name="create" size={20} color={Colors.text} />
+						<Text style={styles.secondaryActionText}>Edit Task</Text>
+					</Pressable>
 
-				<Pressable
-					onPress={() => navigation.navigate("TaskForm", { taskId: task.id })}
-					style={({ pressed }) => [
-						styles.secondaryAction,
-						pressed && styles.pressed,
-					]}
-				>
-					<Ionicons name="create" size={21} color={Colors.text} />
-					<Text style={styles.secondaryActionText}>Edit Task</Text>
-				</Pressable>
+					<Pressable
+						onPress={() => void toggleTaskStatus()}
+						disabled={isUpdatingStatus}
+						style={({ pressed }) => [
+							styles.primaryAction,
+							isUpdatingStatus && styles.disabledAction,
+							pressed && styles.pressed,
+						]}
+					>
+						{isUpdatingStatus ? (
+							<ActivityIndicator size="small" color={Colors.background} />
+						) : (
+							<Ionicons
+								name={completed ? "arrow-undo-outline" : "checkmark"}
+								size={19}
+								color={Colors.background}
+							/>
+						)}
+						<Text style={styles.primaryActionText}>
+							{isUpdatingStatus
+								? "Updating…"
+								: completed
+									? "Mark Open"
+									: "Mark Complete"}
+						</Text>
+					</Pressable>
+				</View>
 
-				<Pressable
-					onPress={confirmDelete}
-					disabled={isDeleting}
-					style={({ pressed }) => [
-						styles.secondaryAction,
-						isDeleting && styles.disabledAction,
-						pressed && styles.pressed,
-					]}
-				>
-					{isDeleting ? (
-						<ActivityIndicator size="small" color={Colors.danger} />
-					) : (
-						<Ionicons name="trash-outline" size={19} color={Colors.danger} />
-					)}
-					<Text style={styles.deleteActionText}>
-						{isDeleting ? "Deleting…" : "Delete Task"}
-					</Text>
-				</Pressable>
 			</ScrollView>
 		</SafeAreaView>
 	);
