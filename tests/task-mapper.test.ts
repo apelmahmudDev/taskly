@@ -21,9 +21,10 @@ describe("mapTaskRow", () => {
 			description: "",
 			categoryId: "",
 			category: "Uncategorized",
-			categoryColor: Colors.primarySoft,
-			completed: true,
-			starred: false,
+		categoryColor: Colors.primarySoft,
+		completed: true,
+		starred: false,
+		urgent: false,
 		});
 		expect(task.updatedAt).toBe("2026-07-25T10:00:00.000Z");
 	});

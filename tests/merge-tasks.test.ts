@@ -14,6 +14,7 @@ function task(id: string, starred = false): TaskItem {
 		updatedAt: "2026-07-25T00:00:00.000Z",
 		completed: false,
 		starred,
+		urgent: false,
 	};
 }
 

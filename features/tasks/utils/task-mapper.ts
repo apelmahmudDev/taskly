@@ -19,6 +19,7 @@ export function mapTaskRow(row: TaskRow): TaskItem {
 		updatedAt: String(row.updated_at ?? row.created_at ?? ""),
 		completed: Boolean(row.completed),
 		starred: false,
+		urgent: false,
 	};
 }
 

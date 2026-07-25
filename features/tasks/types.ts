@@ -7,10 +7,10 @@ export type TaskItem = {
 	description: string;
 	createdAt: string;
 	updatedAt: string;
-	completed?: boolean;
-	starred?: boolean;
-	urgent?: boolean;
-	categoryId?: string;
+	completed: boolean;
+	starred: boolean;
+	urgent: boolean;
+	categoryId: string;
 };
 
 export type Category = { id: string; name: string; color?: string | null };
