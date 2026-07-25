@@ -212,9 +212,6 @@ function MetadataRow({
 			<View style={styles.metadataValueGroup}>
 				{showStatus && <View style={styles.statusDot} />}
 				<Text style={styles.metadataValue}>{value}</Text>
-				{showStatus && (
-					<Ionicons name="chevron-down" size={13} color={Colors.icon} />
-				)}
 			</View>
 		</View>
 	);
