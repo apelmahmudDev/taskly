@@ -1,14 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import NetInfo from "@react-native-community/netinfo";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-	ActivityIndicator,
-	Alert,
-	FlatList,
-	Pressable,
-	StyleSheet,
-	Text,
-} from "react-native";
+import { Alert, FlatList, Pressable, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
@@ -22,7 +15,11 @@ import {
 	useSetTaskCompletedMutation,
 } from "@/store/services/tasks-api";
 import { setCategories } from "@/store/slices/categories-slice";
-import { setRemoteTasks, toggleStar, updateTask } from "@/store/slices/tasks-slice";
+import {
+	setRemoteTasks,
+	toggleStar,
+	updateTask,
+} from "@/store/slices/tasks-slice";
 import { AdvancedFiltersModal } from "../components/advanced-filters-modal";
 import { TaskCard } from "../components/task-card";
 import { TaskFilterBar } from "../components/task-filter-bar";
@@ -172,18 +169,11 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={["top"]}>
-			<TaskListHeader isOnline={isOnline} />
-			{refreshMode === "background" && (
-				<ActivityIndicator
-					accessibilityLabel="Refreshing tasks"
-					color={Colors.primary}
-				/>
-			)}
-			{lastRefreshed && (
-				<Text style={styles.refreshed}>
-					Last refreshed {new Date(lastRefreshed).toLocaleString()}
-				</Text>
-			)}
+			<TaskListHeader
+				isOnline={isOnline}
+				isRefreshing={refreshMode === "background"}
+				lastRefreshed={lastRefreshed}
+			/>
 			<TaskFilterBar
 				query={query}
 				hasActiveFilters={hasActiveFilters}
@@ -227,11 +217,11 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 
 const styles = StyleSheet.create({
 	safeArea: { flex: 1, backgroundColor: Colors.background },
-	taskList: { backgroundColor: Colors.background },
+	taskList: { backgroundColor: Colors.background, marginTop: 12 },
 	taskListContent: {
 		flexGrow: 1,
 		paddingHorizontal: 18,
-		paddingTop: 14,
+		paddingTop: 0,
 		paddingBottom: 96,
 	},
 	emptyText: {
@@ -239,12 +229,6 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		marginTop: 36,
 		fontSize: 14,
-	},
-	refreshed: {
-		color: Colors.icon,
-		fontSize: 10,
-		textAlign: "center",
-		paddingBottom: 4,
 	},
 	fab: {
 		position: "absolute",
