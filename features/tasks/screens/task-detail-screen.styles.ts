@@ -72,11 +72,6 @@ export const styles = StyleSheet.create({
 		borderWidth: StyleSheet.hairlineWidth,
 		borderColor: Colors.border,
 		backgroundColor: Colors.surface,
-		shadowColor: Colors.text,
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.09,
-		shadowRadius: 5,
-		elevation: 2,
 	},
 	metadataRow: {
 		height: 52,
