@@ -5,16 +5,21 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-if (!supabaseUrl || !supabasePublishableKey) {
-	throw new Error(
-		"Missing Supabase environment variables. Check your .env file.",
-	);
-}
+export const supabase =
+	supabaseUrl && supabasePublishableKey
+		? createClient(supabaseUrl, supabasePublishableKey, {
+				auth: {
+					autoRefreshToken: false,
+					persistSession: false,
+					detectSessionInUrl: false,
+				},
+			})
+		: null;
 
-export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
-	auth: {
-		autoRefreshToken: false,
-		persistSession: false,
-		detectSessionInUrl: false,
-	},
-});
+export function getSupabase() {
+	if (!supabase)
+		throw new Error(
+			"Missing EXPO_PUBLIC_SUPABASE_URL or EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY.",
+		);
+	return supabase;
+}
