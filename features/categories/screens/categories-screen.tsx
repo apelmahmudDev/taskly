@@ -4,6 +4,7 @@ import {
 	ActivityIndicator,
 	Alert,
 	FlatList,
+	Keyboard,
 	Pressable,
 	StyleSheet,
 	Text,
@@ -73,6 +74,7 @@ export function CategoriesScreen() {
 			dispatch(addCategory(created));
 			await dispatch(persistCache()).unwrap();
 			setName("");
+			Keyboard.dismiss();
 		} catch (error) {
 			Alert.alert("Could not add category", mutationErrorMessage(error));
 		}
