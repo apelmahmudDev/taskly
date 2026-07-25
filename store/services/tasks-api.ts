@@ -69,6 +69,32 @@ export const tasksApi = api.injectEndpoints({
 				}
 			},
 		}),
+		setTaskCompleted: builder.mutation<
+			TaskItem,
+			{ id: string; completed: boolean }
+		>({
+			queryFn: async ({ id, completed }) => {
+				try {
+					const { data, error } = await getSupabase()
+						.from("tasks")
+						.update({
+							completed,
+							updated_at: new Date().toISOString(),
+						})
+						.eq("id", id)
+						.select(taskSelect);
+					if (error) throw error;
+					if (!data || data.length === 0) {
+						throw new Error(
+							"We couldn't find this task. Refresh your task list and try again.",
+						);
+					}
+					return { data: mapTaskRow(data[0]) };
+				} catch (error) {
+					return toQueryError(error);
+				}
+			},
+		}),
 		deleteTask: builder.mutation<string, string>({
 			queryFn: async (id) => {
 				try {
@@ -97,5 +123,6 @@ export const {
 	useLazyGetTasksQuery,
 	useCreateTaskMutation,
 	useEditTaskMutation,
+	useSetTaskCompletedMutation,
 	useDeleteTaskMutation,
 } = tasksApi;

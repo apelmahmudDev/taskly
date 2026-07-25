@@ -10,6 +10,7 @@ type TaskCardProps = {
 	task: TaskItem;
 	onPress: () => void;
 	onToggle: () => void;
+	toggleDisabled?: boolean;
 	onToggleStar: () => void;
 };
 
@@ -17,6 +18,7 @@ function TaskCardComponent({
 	task,
 	onPress,
 	onToggle,
+	toggleDisabled = false,
 	onToggleStar,
 }: TaskCardProps) {
 	return (
@@ -31,10 +33,15 @@ function TaskCardComponent({
 				accessibilityRole="checkbox"
 				accessibilityState={{ checked: Boolean(task.completed) }}
 				onPress={(event) => {
-					event.stopPropagation();
 					onToggle();
+					event.stopPropagation();
 				}}
-				style={[styles.checkbox, task.completed && styles.checkedBox]}
+				disabled={toggleDisabled}
+				style={[
+					styles.checkbox,
+					task.completed && styles.checkedBox,
+					toggleDisabled && styles.disabledCheckbox,
+				]}
 			>
 				{task.completed && (
 					<Ionicons name="checkmark" size={15} color={Colors.background} />
@@ -69,7 +76,7 @@ function TaskCardComponent({
 				>
 					<Ionicons
 						name={task.starred ? "star" : "star-outline"}
-						size={22}
+						size={19}
 						color={
 							task.starred
 								? task.urgent
@@ -116,6 +123,7 @@ const styles = StyleSheet.create({
 		borderColor: Colors.primary,
 		backgroundColor: Colors.primary,
 	},
+	disabledCheckbox: { opacity: 0.5 },
 	details: {
 		flex: 1,
 		minWidth: 0,

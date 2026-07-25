@@ -3,6 +3,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	ActivityIndicator,
+	Alert,
 	FlatList,
 	Pressable,
 	StyleSheet,
@@ -16,9 +17,12 @@ import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import type { TasksScreenProps } from "@/navigation/navigation-types";
 import { persistCache } from "@/store/persistence/cache";
 import { useLazyGetCategoriesQuery } from "@/store/services/categories-api";
-import { useLazyGetTasksQuery } from "@/store/services/tasks-api";
+import {
+	useLazyGetTasksQuery,
+	useSetTaskCompletedMutation,
+} from "@/store/services/tasks-api";
 import { setCategories } from "@/store/slices/categories-slice";
-import { setRemoteTasks, toggleStar } from "@/store/slices/tasks-slice";
+import { setRemoteTasks, toggleStar, updateTask } from "@/store/slices/tasks-slice";
 import { AdvancedFiltersModal } from "../components/advanced-filters-modal";
 import { TaskCard } from "../components/task-card";
 import { TaskFilterBar } from "../components/task-filter-bar";
@@ -42,6 +46,10 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 	const [isOnline, setIsOnline] = useState(true);
 	const [getTasks, tasksRequest] = useLazyGetTasksQuery();
 	const [getCategories] = useLazyGetCategoriesQuery();
+	const [setTaskCompleted] = useSetTaskCompletedMutation();
+	const [pendingTaskIds, setPendingTaskIds] = useState<Set<string>>(
+		() => new Set(),
+	);
 	const tasksRef = useRef(tasks);
 	tasksRef.current = tasks;
 	const [query, setQuery] = useState("");
@@ -86,19 +94,47 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 		[category, debouncedQuery, sortBy, status, tasks],
 	);
 
+	const toggleTaskStatus = useCallback(
+		async (task: TaskItem) => {
+			setPendingTaskIds((current) => new Set(current).add(task.id));
+			try {
+				const updatedTask = await setTaskCompleted({
+					id: task.id,
+					completed: !task.completed,
+				}).unwrap();
+				dispatch(updateTask(updatedTask));
+				await dispatch(persistCache()).unwrap();
+			} catch (error) {
+				const message =
+					typeof error === "object" && error && "error" in error
+						? String(error.error)
+						: "Please try again.";
+				Alert.alert("Could not update task", message);
+			} finally {
+				setPendingTaskIds((current) => {
+					const next = new Set(current);
+					next.delete(task.id);
+					return next;
+				});
+			}
+		},
+		[dispatch, setTaskCompleted],
+	);
+
 	const renderTask = useCallback(
 		({ item }: { item: TaskItem }) => (
 			<TaskCard
 				task={item}
 				onPress={() => navigation.navigate("TaskDetail", { taskId: item.id })}
-				onToggle={() => undefined}
+				onToggle={() => void toggleTaskStatus(item)}
+				toggleDisabled={pendingTaskIds.has(item.id)}
 				onToggleStar={() => {
 					dispatch(toggleStar(item.id));
 					dispatch(persistCache());
 				}}
 			/>
 		),
-		[dispatch, navigation],
+		[dispatch, navigation, pendingTaskIds, toggleTaskStatus],
 	);
 
 	return (
