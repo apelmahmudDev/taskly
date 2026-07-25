@@ -1,15 +1,24 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { memo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
 
 type CategoryCardProps = {
 	name: string;
 	taskCount: number;
+	onRename: () => void;
+	onDelete: () => void;
+	isDeleting?: boolean;
 };
 
-function CategoryCardComponent({ name, taskCount }: CategoryCardProps) {
+function CategoryCardComponent({
+	name,
+	taskCount,
+	onRename,
+	onDelete,
+	isDeleting,
+}: CategoryCardProps) {
 	return (
 		<View style={styles.card}>
 			<View style={styles.icon}>
@@ -21,12 +30,28 @@ function CategoryCardComponent({ name, taskCount }: CategoryCardProps) {
 					{taskCount} {taskCount === 1 ? "task" : "tasks"}
 				</Text>
 			</View>
-			<Ionicons
-				name="chevron-forward"
-				size={18}
-				color={Colors.icon}
-				style={styles.chevron}
-			/>
+			<Pressable
+				onPress={onRename}
+				disabled={isDeleting}
+				accessibilityRole="button"
+				accessibilityLabel={`Rename ${name}`}
+				style={styles.action}
+			>
+				<Ionicons name="pencil-outline" size={18} color={Colors.primary} />
+			</Pressable>
+			<Pressable
+				onPress={onDelete}
+				disabled={isDeleting}
+				accessibilityRole="button"
+				accessibilityLabel={`Delete ${name}`}
+				style={styles.action}
+			>
+				{isDeleting ? (
+					<ActivityIndicator size="small" color={Colors.danger} />
+				) : (
+					<Ionicons name="trash-outline" size={18} color={Colors.danger} />
+				)}
+			</Pressable>
 		</View>
 	);
 }
@@ -64,5 +89,10 @@ const styles = StyleSheet.create({
 		color: Colors.icon,
 		fontSize: 11,
 	},
-	chevron: { opacity: 0.45 },
+	action: {
+		width: 38,
+		height: 38,
+		alignItems: "center",
+		justifyContent: "center",
+	},
 });

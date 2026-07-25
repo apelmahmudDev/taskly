@@ -21,7 +21,7 @@ create table if not exists public.tasks (
 alter table public.categories enable row level security;
 alter table public.tasks enable row level security;
 
-grant select, insert
+grant select, insert, update, delete
   on table public.categories
   to anon, authenticated;
 
@@ -31,6 +31,8 @@ grant select, insert, update, delete
 
 drop policy if exists "assessment categories read" on public.categories;
 drop policy if exists "assessment categories insert" on public.categories;
+drop policy if exists "assessment categories update" on public.categories;
+drop policy if exists "assessment categories delete" on public.categories;
 drop policy if exists "assessment tasks read" on public.tasks;
 drop policy if exists "assessment tasks insert" on public.tasks;
 drop policy if exists "assessment tasks update" on public.tasks;
@@ -45,6 +47,17 @@ create policy "assessment categories insert"
   on public.categories
   for insert
   with check (true);
+
+create policy "assessment categories update"
+  on public.categories
+  for update
+  using (true)
+  with check (true);
+
+create policy "assessment categories delete"
+  on public.categories
+  for delete
+  using (true);
 
 create policy "assessment tasks read"
   on public.tasks

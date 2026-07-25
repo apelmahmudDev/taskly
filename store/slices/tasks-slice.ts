@@ -45,6 +45,24 @@ export const tasksSlice = createSlice({
 		removeTask(state, action: PayloadAction<string>) {
 			state.items = state.items.filter((task) => task.id !== action.payload);
 		},
+		renameTaskCategory(
+			state,
+			action: PayloadAction<{ categoryId: string; name: string }>,
+		) {
+			for (const task of state.items) {
+				if (task.categoryId === action.payload.categoryId) {
+					task.category = action.payload.name;
+				}
+			}
+		},
+		clearTaskCategory(state, action: PayloadAction<string>) {
+			for (const task of state.items) {
+				if (task.categoryId === action.payload) {
+					task.categoryId = "";
+					task.category = "Uncategorized";
+				}
+			}
+		},
 
 		toggleStar(state, action: PayloadAction<string>) {
 			const task = state.items.find((item) => item.id === action.payload);
@@ -66,5 +84,12 @@ export const tasksSlice = createSlice({
 			}),
 });
 
-export const { setRemoteTasks, addTask, updateTask, removeTask, toggleStar } =
-	tasksSlice.actions;
+export const {
+	setRemoteTasks,
+	addTask,
+	updateTask,
+	removeTask,
+	renameTaskCategory,
+	clearTaskCategory,
+	toggleStar,
+} = tasksSlice.actions;

@@ -16,6 +16,15 @@ export const categoriesSlice = createSlice({
 		addCategory(state, action: PayloadAction<Category>) {
 			state.items.push(action.payload);
 		},
+		updateCategory(state, action: PayloadAction<Category>) {
+			const category = state.items.find(
+				(item) => item.id === action.payload.id,
+			);
+			if (category) category.name = action.payload.name;
+		},
+		removeCategory(state, action: PayloadAction<string>) {
+			state.items = state.items.filter((item) => item.id !== action.payload);
+		},
 	},
 	extraReducers: (builder) =>
 		builder.addCase(hydrateCache.fulfilled, (state, action) => {
@@ -23,4 +32,5 @@ export const categoriesSlice = createSlice({
 		}),
 });
 
-export const { setCategories, addCategory } = categoriesSlice.actions;
+export const { setCategories, addCategory, updateCategory, removeCategory } =
+	categoriesSlice.actions;

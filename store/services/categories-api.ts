@@ -34,9 +34,53 @@ export const categoriesApi = api.injectEndpoints({
 				}
 			},
 		}),
+		renameCategory: builder.mutation<Category, { id: string; name: string }>({
+			queryFn: async ({ id, name }) => {
+				try {
+					const { data, error } = await getSupabase()
+						.from("categories")
+						.update({ name })
+						.eq("id", id)
+						.select("id,name");
+					if (error) throw error;
+					if (!data || data.length === 0) {
+						throw new Error(
+							"Category could not be found or you do not have permission to rename it.",
+						);
+					}
+					return { data: data[0] };
+				} catch (error) {
+					return toQueryError(error);
+				}
+			},
+		}),
+		deleteCategory: builder.mutation<string, string>({
+			queryFn: async (id) => {
+				try {
+					const { data, error } = await getSupabase()
+						.from("categories")
+						.delete()
+						.eq("id", id)
+						.select("id");
+					if (error) throw error;
+					if (!data || data.length === 0) {
+						throw new Error(
+							"Category could not be found or you do not have permission to delete it.",
+						);
+					}
+					return { data: id };
+				} catch (error) {
+					return toQueryError(error);
+				}
+			},
+		}),
 	}),
 	overrideExisting: false,
 });
 
-export const { useLazyGetCategoriesQuery, useCreateCategoryMutation } =
-	categoriesApi;
+export const {
+	useLazyGetCategoriesQuery,
+	useCreateCategoryMutation,
+	useRenameCategoryMutation,
+	useDeleteCategoryMutation,
+} = categoriesApi;
