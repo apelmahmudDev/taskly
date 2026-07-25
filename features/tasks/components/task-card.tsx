@@ -3,8 +3,8 @@ import { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
+import { formatDate } from "@/utils/format-date";
 import type { TaskItem } from "../types";
-import { formatTaskDate } from "../utils/format-task-date";
 
 type TaskCardProps = {
 	task: TaskItem;
@@ -55,7 +55,7 @@ function TaskCardComponent({
 
 			<View style={styles.endContent}>
 				<Text style={[styles.due, task.urgent && styles.urgentDue]}>
-					{formatTaskDate(task.due)}
+					{formatDate(task.due, "")}
 				</Text>
 				<Pressable
 					accessibilityLabel={

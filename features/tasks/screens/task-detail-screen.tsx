@@ -4,15 +4,29 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
-import { TASKS } from "@/features/tasks/data/tasks";
+import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import type { TaskDetailScreenProps } from "@/navigation/navigation-types";
+import { persistCache } from "@/store/persistence/cache";
+import { toggleStar } from "@/store/slices/tasks-slice";
+import { formatDate, formatDateTime } from "@/utils/format-date";
 import { styles } from "./task-detail-screen.styles";
 
 export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
-	const task =
-		TASKS.find((item) => item.id === route.params.taskId) ?? TASKS[0];
-	const [completed, setCompleted] = useState(Boolean(task.completed));
-	const [starred, setStarred] = useState(Boolean(task.starred));
+	const dispatch = useAppDispatch();
+
+	const task = useAppSelector((state) =>
+		state.tasks.items.find((item) => item.id === route.params.taskId),
+	);
+
+	const [completed, setCompleted] = useState(Boolean(task?.completed));
+	const [starred, setStarred] = useState(Boolean(task?.starred));
+
+	if (!task)
+		return (
+			<SafeAreaView style={styles.safeArea}>
+				<Text style={styles.title}>Task not found</Text>
+			</SafeAreaView>
+		);
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
@@ -31,7 +45,11 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 							starred ? "Remove from starred" : "Add to starred"
 						}
 						hitSlop={12}
-						onPress={() => setStarred((value) => !value)}
+						onPress={() => {
+							setStarred((value) => !value);
+							dispatch(toggleStar(task.id));
+							dispatch(persistCache());
+						}}
 						style={styles.headerButton}
 					>
 						<Ionicons
@@ -58,28 +76,33 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 					<Ionicons name="briefcase-outline" size={16} color={Colors.primary} />
 					<Text style={styles.categoryText}>{task.category}</Text>
 				</View>
+
 				<View style={styles.dueRow}>
 					<View style={styles.dueDate}>
 						<Ionicons name="calendar-outline" size={17} color={Colors.icon} />
-						<Text style={styles.dueText}>{task.due}</Text>
+						<Text style={styles.dueText}>
+							{formatDate(task.due, "No due date")}
+						</Text>
 					</View>
 					<View style={styles.statusBadge}>
 						<Text style={styles.statusText}>{completed ? "Done" : "Open"}</Text>
 					</View>
 				</View>
+
 				<Text style={styles.sectionTitle}>Description</Text>
 				<Text style={styles.description}>{task.description}</Text>
+
 				<View style={styles.metadataCard}>
 					<MetadataRow
 						icon="document-text-outline"
 						label="Created"
-						value={task.createdAt}
+						value={formatDateTime(task.createdAt)}
 					/>
 					<View style={styles.divider} />
 					<MetadataRow
 						icon="time-outline"
 						label="Last Updated"
-						value={task.updatedAt}
+						value={formatDateTime(task.updatedAt)}
 					/>
 					<View style={styles.divider} />
 					<MetadataRow
@@ -89,6 +112,7 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 						showStatus
 					/>
 				</View>
+
 				<Pressable
 					onPress={() => setCompleted((value) => !value)}
 					style={({ pressed }) => [
@@ -105,6 +129,7 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 						{completed ? "Mark as Open" : "Mark as Complete"}
 					</Text>
 				</Pressable>
+
 				<Pressable
 					onPress={() => navigation.navigate("TaskForm", { taskId: task.id })}
 					style={({ pressed }) => [
@@ -115,6 +140,7 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 					<Ionicons name="pencil-outline" size={19} color={Colors.text} />
 					<Text style={styles.secondaryActionText}>Edit Task</Text>
 				</Pressable>
+
 				<Pressable
 					style={({ pressed }) => [
 						styles.secondaryAction,

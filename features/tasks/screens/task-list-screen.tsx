@@ -1,12 +1,24 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useCallback, useMemo, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	ActivityIndicator,
+	FlatList,
+	Pressable,
+	StyleSheet,
+	Text,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
-import { TASKS } from "@/features/tasks/data/tasks";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import type { TasksScreenProps } from "@/navigation/navigation-types";
+import { persistCache } from "@/store/persistence/cache";
+import { useLazyGetCategoriesQuery } from "@/store/services/categories-api";
+import { useLazyGetTasksQuery } from "@/store/services/tasks-api";
+import { setCategories } from "@/store/slices/categories-slice";
+import { setRemoteTasks, toggleStar } from "@/store/slices/tasks-slice";
 import { AdvancedFiltersModal } from "../components/advanced-filters-modal";
 import { TaskCard } from "../components/task-card";
 import { TaskFilterBar } from "../components/task-filter-bar";
@@ -17,9 +29,21 @@ import {
 	type TaskSortOption,
 	type TaskStatusFilter,
 } from "../utils/filter-and-sort-tasks";
+import { mergeRemoteTasks } from "../utils/task-mapper";
 
 export function TaskListScreen({ navigation }: TasksScreenProps) {
-	const [tasks, setTasks] = useState(TASKS);
+	const dispatch = useAppDispatch();
+	const {
+		items: tasks,
+		hydrated,
+		lastRefreshed,
+	} = useAppSelector((state) => state.tasks);
+	const categories = useAppSelector((state) => state.categories.items);
+	const [isOnline, setIsOnline] = useState(true);
+	const [getTasks, tasksRequest] = useLazyGetTasksQuery();
+	const [getCategories] = useLazyGetCategoriesQuery();
+	const tasksRef = useRef(tasks);
+	tasksRef.current = tasks;
 	const [query, setQuery] = useState("");
 	const [category, setCategory] = useState("All");
 	const [status, setStatus] = useState<TaskStatusFilter>("All");
@@ -27,6 +51,29 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 	const [filtersVisible, setFiltersVisible] = useState(false);
 	const debouncedQuery = useDebouncedValue(query, 300);
 	const hasActiveFilters = category !== "All" || status !== "All";
+
+	useEffect(
+		() =>
+			NetInfo.addEventListener((state) =>
+				setIsOnline(Boolean(state.isConnected)),
+			),
+		[],
+	);
+	useEffect(() => {
+		if (!hydrated || !isOnline) return;
+		void Promise.all([getTasks().unwrap(), getCategories().unwrap()])
+			.then(([remoteTasks, remoteCategories]) => {
+				dispatch(
+					setRemoteTasks({
+						tasks: mergeRemoteTasks(remoteTasks, tasksRef.current),
+						refreshedAt: new Date().toISOString(),
+					}),
+				);
+				dispatch(setCategories(remoteCategories));
+				dispatch(persistCache());
+			})
+			.catch(() => undefined);
+	}, [dispatch, getCategories, getTasks, hydrated, isOnline]);
 
 	const visibleTasks = useMemo(
 		() =>
@@ -39,27 +86,35 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 		[category, debouncedQuery, sortBy, status, tasks],
 	);
 
-	const updateTask = useCallback((id: string, change: Partial<TaskItem>) => {
-		setTasks((current) =>
-			current.map((task) => (task.id === id ? { ...task, ...change } : task)),
-		);
-	}, []);
-
 	const renderTask = useCallback(
 		({ item }: { item: TaskItem }) => (
 			<TaskCard
 				task={item}
 				onPress={() => navigation.navigate("TaskDetail", { taskId: item.id })}
-				onToggle={() => updateTask(item.id, { completed: !item.completed })}
-				onToggleStar={() => updateTask(item.id, { starred: !item.starred })}
+				onToggle={() => undefined}
+				onToggleStar={() => {
+					dispatch(toggleStar(item.id));
+					dispatch(persistCache());
+				}}
 			/>
 		),
-		[navigation, updateTask],
+		[dispatch, navigation],
 	);
 
 	return (
 		<SafeAreaView style={styles.safeArea} edges={["top"]}>
-			<TaskListHeader isOnline={false} />
+			<TaskListHeader isOnline={isOnline} />
+			{tasksRequest.isFetching && (
+				<ActivityIndicator
+					accessibilityLabel="Refreshing tasks"
+					color={Colors.primary}
+				/>
+			)}
+			{lastRefreshed && (
+				<Text style={styles.refreshed}>
+					Last refreshed {new Date(lastRefreshed).toLocaleString()}
+				</Text>
+			)}
 			<TaskFilterBar
 				query={query}
 				hasActiveFilters={hasActiveFilters}
@@ -83,6 +138,7 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 			>
 				<Ionicons name="add" size={32} color={Colors.background} />
 			</Pressable>
+
 			<AdvancedFiltersModal
 				visible={filtersVisible}
 				category={category}
@@ -92,6 +148,7 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 				onStatusChange={setStatus}
 				onSortChange={setSortBy}
 				onClose={() => setFiltersVisible(false)}
+				categories={categories.map((item) => item.name)}
 			/>
 		</SafeAreaView>
 	);
@@ -111,6 +168,12 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		marginTop: 36,
 		fontSize: 14,
+	},
+	refreshed: {
+		color: Colors.icon,
+		fontSize: 10,
+		textAlign: "center",
+		paddingBottom: 4,
 	},
 	fab: {
 		position: "absolute",
