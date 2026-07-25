@@ -1,6 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import NetInfo from "@react-native-community/netinfo";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Alert, FlatList, Pressable, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -9,49 +8,31 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import type { TasksScreenProps } from "@/navigation/navigation-types";
 import { persistCache } from "@/store/persistence/cache";
-import { useLazyGetCategoriesQuery } from "@/store/services/categories-api";
-import {
-	useLazyGetTasksQuery,
-	useSetTaskCompletedMutation,
-} from "@/store/services/tasks-api";
-import { setCategories } from "@/store/slices/categories-slice";
-import {
-	setRemoteTasks,
-	toggleStar,
-	updateTask,
-} from "@/store/slices/tasks-slice";
+import { useSetTaskCompletedMutation } from "@/store/services/tasks-api";
+import { toggleStar, updateTask } from "@/store/slices/tasks-slice";
 import { AdvancedFiltersModal } from "../components/advanced-filters-modal";
 import { TaskCard } from "../components/task-card";
 import { TaskFilterBar } from "../components/task-filter-bar";
 import { TaskListHeader } from "../components/task-list-header";
+import { useTaskSync } from "../hooks/use-task-sync";
 import type { TaskItem } from "../types";
 import {
 	selectVisibleTasks,
 	type TaskSortOption,
 	type TaskStatusFilter,
 } from "../utils/filter-and-sort-tasks";
-import { mergeRemoteTasks } from "../utils/task-mapper";
 
 export function TaskListScreen({ navigation }: TasksScreenProps) {
 	const dispatch = useAppDispatch();
-	const {
-		items: tasks,
-		hydrated,
-		lastRefreshed,
-	} = useAppSelector((state) => state.tasks);
-	const categories = useAppSelector((state) => state.categories.items);
-	const [isOnline, setIsOnline] = useState(true);
-	const [getTasks] = useLazyGetTasksQuery();
-	const [getCategories] = useLazyGetCategoriesQuery();
-	const [setTaskCompleted] = useSetTaskCompletedMutation();
-	const [refreshMode, setRefreshMode] = useState<"background" | "pull" | null>(
-		null,
+	const { items: tasks, lastRefreshed } = useAppSelector(
+		(state) => state.tasks,
 	);
+	const categories = useAppSelector((state) => state.categories.items);
+	const { isOnline, refreshMode, refreshTasks } = useTaskSync();
+	const [setTaskCompleted] = useSetTaskCompletedMutation();
 	const [pendingTaskIds, setPendingTaskIds] = useState<Set<string>>(
 		() => new Set(),
 	);
-	const tasksRef = useRef(tasks);
-	tasksRef.current = tasks;
 	const [query, setQuery] = useState("");
 	const [category, setCategory] = useState("All");
 	const [status, setStatus] = useState<TaskStatusFilter>("All");
@@ -59,59 +40,6 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 	const [filtersVisible, setFiltersVisible] = useState(false);
 	const debouncedQuery = useDebouncedValue(query, 300);
 	const hasActiveFilters = category !== "All" || status !== "All";
-
-	useEffect(
-		() =>
-			NetInfo.addEventListener((state) =>
-				setIsOnline(Boolean(state.isConnected)),
-			),
-		[],
-	);
-	const refreshFromBackend = useCallback(
-		async (mode: "background" | "pull") => {
-			if (!isOnline) {
-				if (mode === "pull") {
-					Alert.alert(
-						"You're offline",
-						"Connect to the internet to refresh your tasks.",
-					);
-				}
-				return;
-			}
-
-			setRefreshMode(mode);
-			try {
-				const [remoteTasks, remoteCategories] = await Promise.all([
-					getTasks().unwrap(),
-					getCategories().unwrap(),
-				]);
-				dispatch(
-					setRemoteTasks({
-						tasks: mergeRemoteTasks(remoteTasks, tasksRef.current),
-						refreshedAt: new Date().toISOString(),
-					}),
-				);
-				dispatch(setCategories(remoteCategories));
-				await dispatch(persistCache()).unwrap();
-			} catch (error) {
-				if (mode === "pull") {
-					const message =
-						typeof error === "object" && error && "error" in error
-							? String(error.error)
-							: "Your cached tasks are still available. Please try again.";
-					Alert.alert("Could not refresh tasks", message);
-				}
-			} finally {
-				setRefreshMode(null);
-			}
-		},
-		[dispatch, getCategories, getTasks, isOnline],
-	);
-
-	useEffect(() => {
-		if (!hydrated || !isOnline) return;
-		void refreshFromBackend("background");
-	}, [hydrated, isOnline, refreshFromBackend]);
 
 	const visibleTasks = useMemo(
 		() =>
@@ -183,7 +111,7 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 			<FlatList
 				data={visibleTasks}
 				refreshing={refreshMode === "pull"}
-				onRefresh={() => void refreshFromBackend("pull")}
+				onRefresh={() => void refreshTasks("pull")}
 				renderItem={renderTask}
 				keyExtractor={(item) => item.id}
 				style={styles.taskList}
@@ -216,8 +144,14 @@ export function TaskListScreen({ navigation }: TasksScreenProps) {
 }
 
 const styles = StyleSheet.create({
-	safeArea: { flex: 1, backgroundColor: Colors.background },
-	taskList: { backgroundColor: Colors.background, marginTop: 12 },
+	safeArea: {
+		flex: 1,
+		backgroundColor: Colors.background,
+	},
+	taskList: {
+		backgroundColor: Colors.background,
+		marginTop: 12,
+	},
 	taskListContent: {
 		flexGrow: 1,
 		paddingHorizontal: 18,
@@ -246,5 +180,8 @@ const styles = StyleSheet.create({
 		shadowRadius: 7,
 		elevation: 6,
 	},
-	fabPressed: { transform: [{ scale: 0.96 }], opacity: 0.9 },
+	fabPressed: {
+		transform: [{ scale: 0.96 }],
+		opacity: 0.9,
+	},
 });
