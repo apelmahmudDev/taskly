@@ -6,7 +6,6 @@ import type { TaskSortOption, TaskStatusFilter } from "../utils/filter-and-sort-
 import { styles } from "./advanced-filters-modal.styles";
 import { FilterChip } from "./filter-chip";
 
-const CATEGORY_FILTERS = ["All", "Work", "Personal", "Shopping", "Health"];
 const STATUS_FILTERS: TaskStatusFilter[] = ["All", "Open", "Done"];
 const SORT_OPTIONS: TaskSortOption[] = ["Due date", "Created time"];
 
@@ -19,6 +18,7 @@ type AdvancedFiltersModalProps = {
 	onStatusChange: (status: TaskStatusFilter) => void;
 	onSortChange: (sortBy: TaskSortOption) => void;
 	onClose: () => void;
+	categories: string[];
 };
 
 export function AdvancedFiltersModal({
@@ -30,6 +30,7 @@ export function AdvancedFiltersModal({
 	onStatusChange,
 	onSortChange,
 	onClose,
+	categories,
 }: AdvancedFiltersModalProps) {
 	const resetFilters = () => {
 		onCategoryChange("All");
@@ -66,7 +67,7 @@ export function AdvancedFiltersModal({
 
 					<Text style={styles.sectionLabel}>Category</Text>
 					<View style={styles.sheetChipRow}>
-						{CATEGORY_FILTERS.map((item) => (
+						{["All", ...categories].map((item) => (
 							<FilterChip
 								key={item}
 								label={item}

@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
 import type { TaskItem } from "../types";
+import { formatTaskDate } from "../utils/format-task-date";
 
 type TaskCardProps = {
 	task: TaskItem;
@@ -54,7 +55,7 @@ function TaskCardComponent({
 
 			<View style={styles.endContent}>
 				<Text style={[styles.due, task.urgent && styles.urgentDue]}>
-					{task.due}
+					{formatTaskDate(task.due)}
 				</Text>
 				<Pressable
 					accessibilityLabel={
@@ -98,7 +99,9 @@ const styles = StyleSheet.create({
 		borderWidth: StyleSheet.hairlineWidth,
 		borderColor: "rgba(46, 46, 46, 0.1)",
 	},
-	pressedCard: { opacity: 0.82 },
+	pressedCard: {
+		opacity: 0.82,
+	},
 	checkbox: {
 		width: 22,
 		height: 22,
@@ -109,23 +112,45 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		marginRight: 12,
 	},
-	checkedBox: { borderColor: Colors.primary, backgroundColor: Colors.primary },
-	details: { flex: 1, minWidth: 0 },
+	checkedBox: {
+		borderColor: Colors.primary,
+		backgroundColor: Colors.primary,
+	},
+	details: {
+		flex: 1,
+		minWidth: 0,
+	},
 	title: {
 		color: Colors.text,
 		fontSize: 14,
 		lineHeight: 20,
 		fontWeight: "700",
 	},
-	completedTitle: { color: Colors.icon },
-	metaRow: { flexDirection: "row", alignItems: "center", gap: 5, marginTop: 2 },
-	category: { color: Colors.icon, fontSize: 10 },
+	completedTitle: {
+		color: Colors.icon,
+	},
+	metaRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 5,
+		marginTop: 2,
+	},
+	category: {
+		color: Colors.icon,
+		fontSize: 10,
+	},
 	endContent: {
 		marginLeft: 8,
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 10,
 	},
-	due: { color: Colors.primary, fontSize: 9, fontWeight: "700" },
-	urgentDue: { color: Colors.danger },
+	due: {
+		color: Colors.primary,
+		fontSize: 9,
+		fontWeight: "700",
+	},
+	urgentDue: {
+		color: Colors.danger,
+	},
 });

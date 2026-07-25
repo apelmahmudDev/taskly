@@ -7,6 +7,9 @@ import { Colors } from "@/constants/theme";
 import { navigationTheme } from "@/navigation/navigation-theme";
 import { RootNavigator } from "@/navigation/root-navigator";
 import { store } from "@/store";
+import { hydrateCache } from "@/store/persistence/cache";
+
+store.dispatch(hydrateCache());
 
 export default function App() {
 	return (
@@ -16,7 +19,12 @@ export default function App() {
 			>
 				<NavigationContainer theme={navigationTheme}>
 					<RootNavigator />
-					<StatusBar style="dark" />
+					<StatusBar
+						style="dark"
+						hidden={false}
+						backgroundColor={Colors.background}
+						translucent={false}
+					/>
 				</NavigationContainer>
 			</SafeAreaProvider>
 		</Provider>

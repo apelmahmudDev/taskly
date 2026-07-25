@@ -10,4 +10,12 @@ export type TaskItem = {
 	completed?: boolean;
 	starred?: boolean;
 	urgent?: boolean;
+	categoryId?: string;
+};
+
+export type Category = { id: string; name: string; color?: string | null };
+export type TaskInput = { title: string; description: string; categoryId: string; dueDate: string };
+export type EditTaskInput = {
+	id: string;
+	changes: TaskInput & { completed: boolean };
 };

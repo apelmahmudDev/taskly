@@ -1,31 +1,51 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+	Alert,
+	FlatList,
+	Pressable,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Input } from "@/components/ui/input";
 import { Colors } from "@/constants/theme";
-import { TASKS } from "@/features/tasks/data/tasks";
+import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
+import { persistCache } from "@/store/persistence/cache";
+import { useCreateCategoryMutation } from "@/store/services/categories-api";
+import { addCategory } from "@/store/slices/categories-slice";
 import { CategoryCard } from "../components/category-card";
 
-const INITIAL_CATEGORIES = ["Work", "Personal", "Shopping", "Health"];
-const TASK_COUNT_BY_CATEGORY = TASKS.reduce<Record<string, number>>(
-	(counts, task) => ({
-		...counts,
-		[task.category]: (counts[task.category] ?? 0) + 1,
-	}),
-	{},
-);
-
 export function CategoriesScreen() {
-	const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+	const dispatch = useAppDispatch();
+	const categories = useAppSelector((state) => state.categories.items);
+	const tasks = useAppSelector((state) => state.tasks.items);
+	const [createCategory, { isLoading }] = useCreateCategoryMutation();
 	const [name, setName] = useState("");
 
-	const addCategory = () => {
+	const handleAddCategory = async () => {
 		const trimmedName = name.trim();
-		if (!trimmedName || categories.includes(trimmedName)) return;
-		setCategories((current) => [...current, trimmedName]);
-		setName("");
+		if (
+			!trimmedName ||
+			categories.some(
+				(item) => item.name.toLowerCase() === trimmedName.toLowerCase(),
+			)
+		)
+			return;
+		try {
+			const created = await createCategory(trimmedName).unwrap();
+			dispatch(addCategory(created));
+			await dispatch(persistCache()).unwrap();
+			setName("");
+		} catch (error) {
+			const message =
+				typeof error === "object" && error && "error" in error
+					? String(error.error)
+					: "Please try again.";
+			Alert.alert("Could not add category", message);
+		}
 	};
 
 	return (
@@ -33,36 +53,36 @@ export function CategoriesScreen() {
 			<Text style={styles.title}>Categories</Text>
 			<View style={styles.addRow}>
 				<View style={styles.inputContainer}>
-					<Ionicons
-						name="search-outline"
-						size={20}
-						color={Colors.primary}
-						style={styles.searchIcon}
-					/>
 					<Input
 						value={name}
 						onChangeText={setName}
-						onSubmitEditing={addCategory}
+						onSubmitEditing={handleAddCategory}
 						placeholder="Category name"
 						style={styles.input}
 					/>
 				</View>
 				<Pressable
-					onPress={addCategory}
+					onPress={handleAddCategory}
+					disabled={isLoading || !name.trim()}
 					accessibilityLabel="Add category"
-					style={styles.addButton}
+					style={[
+						styles.addButton,
+						(isLoading || !name.trim()) && styles.disabledButton,
+					]}
 				>
 					<Ionicons name="add" size={24} color={Colors.background} />
 				</Pressable>
 			</View>
 			<FlatList
 				data={categories}
-				keyExtractor={(item) => item}
+				keyExtractor={(item) => item.id}
 				contentContainerStyle={styles.list}
 				renderItem={({ item }) => (
 					<CategoryCard
-						name={item}
-						taskCount={TASK_COUNT_BY_CATEGORY[item] ?? 0}
+						name={item.name}
+						taskCount={
+							tasks.filter((task) => task.categoryId === item.id).length
+						}
 					/>
 				)}
 			/>
@@ -87,20 +107,12 @@ const styles = StyleSheet.create({
 	},
 	inputContainer: {
 		flex: 1,
-		position: "relative",
 	},
 	input: {
 		width: "100%",
 		minHeight: 48,
 		height: 48,
 		borderRadius: 16,
-		paddingLeft: 44,
-	},
-	searchIcon: {
-		position: "absolute",
-		left: 15,
-		top: 14,
-		zIndex: 1,
 	},
 	addButton: {
 		width: 48,
@@ -110,5 +122,6 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		backgroundColor: Colors.primary,
 	},
+	disabledButton: { opacity: 0.5 },
 	list: { padding: 18, gap: 10 },
 });
