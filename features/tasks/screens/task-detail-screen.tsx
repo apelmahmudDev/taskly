@@ -1,14 +1,28 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import {
+	ActivityIndicator,
+	Alert,
+	Pressable,
+	ScrollView,
+	Text,
+	View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
 import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import type { TaskDetailScreenProps } from "@/navigation/navigation-types";
 import { persistCache } from "@/store/persistence/cache";
-import { useDeleteTaskMutation } from "@/store/services/tasks-api";
-import { removeTask, toggleStar } from "@/store/slices/tasks-slice";
+import {
+	useDeleteTaskMutation,
+	useSetTaskCompletedMutation,
+} from "@/store/services/tasks-api";
+import {
+	removeTask,
+	toggleStar,
+	updateTask,
+} from "@/store/slices/tasks-slice";
 import { formatDate, formatDateTime } from "@/utils/format-date";
 import { styles } from "./task-detail-screen.styles";
 
@@ -19,9 +33,11 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 		state.tasks.items.find((item) => item.id === route.params.taskId),
 	);
 
-	const [completed, setCompleted] = useState(Boolean(task?.completed));
+	const completed = Boolean(task?.completed);
 	const [starred, setStarred] = useState(Boolean(task?.starred));
 	const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
+	const [setTaskCompleted, { isLoading: isUpdatingStatus }] =
+		useSetTaskCompletedMutation();
 
 	if (!task)
 		return (
@@ -42,6 +58,23 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 					? String(error.error)
 					: "Please try again.";
 			Alert.alert("Could not delete task", message);
+		}
+	};
+
+	const toggleTaskStatus = async () => {
+		try {
+			const updatedTask = await setTaskCompleted({
+				id: task.id,
+				completed: !completed,
+			}).unwrap();
+			dispatch(updateTask(updatedTask));
+			await dispatch(persistCache()).unwrap();
+		} catch (error) {
+			const message =
+				typeof error === "object" && error && "error" in error
+					? String(error.error)
+					: "Please try again.";
+			Alert.alert("Could not update task", message);
 		}
 	};
 
@@ -146,19 +179,29 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 				</View>
 
 				<Pressable
-					onPress={() => setCompleted((value) => !value)}
+					onPress={() => void toggleTaskStatus()}
+					disabled={isUpdatingStatus}
 					style={({ pressed }) => [
 						styles.primaryAction,
+						isUpdatingStatus && styles.disabledAction,
 						pressed && styles.pressed,
 					]}
 				>
-					<Ionicons
-						name={completed ? "arrow-undo-outline" : "checkmark"}
-						size={19}
-						color={Colors.background}
-					/>
+					{isUpdatingStatus ? (
+						<ActivityIndicator size="small" color={Colors.background} />
+					) : (
+						<Ionicons
+							name={completed ? "arrow-undo-outline" : "checkmark"}
+							size={19}
+							color={Colors.background}
+						/>
+					)}
 					<Text style={styles.primaryActionText}>
-						{completed ? "Mark as Open" : "Mark as Complete"}
+						{isUpdatingStatus
+							? "Updating…"
+							: completed
+								? "Mark as Open"
+								: "Mark as Complete"}
 					</Text>
 				</Pressable>
 
@@ -182,7 +225,11 @@ export function TaskDetailScreen({ navigation, route }: TaskDetailScreenProps) {
 						pressed && styles.pressed,
 					]}
 				>
-					<Ionicons name="trash-outline" size={19} color={Colors.danger} />
+					{isDeleting ? (
+						<ActivityIndicator size="small" color={Colors.danger} />
+					) : (
+						<Ionicons name="trash-outline" size={19} color={Colors.danger} />
+					)}
 					<Text style={styles.deleteActionText}>
 						{isDeleting ? "Deleting…" : "Delete Task"}
 					</Text>
